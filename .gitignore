@@ -1,0 +1,4 @@
+bin/
+testmodel/
+test-dropins/
+*.class

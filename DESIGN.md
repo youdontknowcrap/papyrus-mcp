@@ -1,0 +1,218 @@
+# Papyrus MCP: design (v1)
+
+Target: Papyrus-Desktop 7.1.0 (Eclipse 2025-06, Java 21, Sirius 7.4.13, GMF classic diagrams).
+Goal: an Eclipse plugin that runs an MCP server inside Papyrus, so an AI bot can read and edit the
+**open** model live. Every edit is undoable with Ctrl+Z.
+
+## 1. Architecture
+
+```
+AI client ──HTTP POST /mcp (JSON-RPC 2.0)──> McpHttpServer (JDK HttpServer, 127.0.0.1:7341)
+                                               │  4 daemon HTTP threads: parse, auth, serialize
+                                               ▼
+                                         ToolRegistry ── Tool.execute()
+                                               │  UiSync.call(...)  = Display.syncExec
+                                               ▼
+                         SWT UI thread: ModelLocator → IMultiDiagramEditor → ServicesRegistry
+                                               │       → ModelSet + TransactionalEditingDomain
+                                               ▼
+                    reads: domain.runExclusive(...)     writes: domain.getCommandStack().execute(cmd)
+```
+
+### 1.1 Transport: a small embedded server, not the MCP Java SDK
+* **Chosen:** the JDK's `com.sun.net.httpserver` plus **Gson** (already ships with Papyrus as
+  `com.google.gson_2.13.1`). Nothing extra to bundle. About 200 lines.
+* **Why not the MCP Java SDK (io.modelcontextprotocol.sdk):** it needs Jackson, Project Reactor and
+  a servlet transport. Those are not OSGi bundles in Papyrus 7.1, so we would have to embed them
+  (fat jar plus `Bundle-ClassPath`), which risks classloader conflicts. We can switch later if
+  we need streaming or sampling.
+* Jetty 12 is in the install too (`org.eclipse.jetty.*_12.0.21`). It is a fallback if the JDK server
+  is ever not enough.
+* **Protocol:** MCP **2025-06-18 Streamable HTTP**. `POST /mcp` takes a request or a batch.
+  * A request gets `200 application/json`.
+  * A notification gets `202`.
+  * `GET` gets `405`. The spec allows this when the server has no SSE stream.
+  * `DELETE` ends the session.
+  * `initialize` returns an `Mcp-Session-Id`.
+* No SSE in v1. Every tool finishes quickly and returns one JSON response. Phase 5 can add SSE
+  progress events for long layouts and validations.
+
+### 1.2 Threading
+* HTTP threads never touch EMF or the workbench directly. `UiSync.call` runs the tool body on the
+  UI thread with `Display.syncExec` and passes back its result or its exception.
+* **Reads** run inside `TransactionalEditingDomain.runExclusive`, so a read never sees half of a write.
+* **Writes** go through `domain.getCommandStack().execute(...)` on the UI thread. GMF edit parts then
+  refresh right away, and the Papyrus undo history is updated.
+* Each `tools/call` that writes produces **exactly one** command on the stack (it can be a
+  `CompoundCommand`), so one Ctrl+Z undoes one bot action.
+* We plan a timeout wrapper for v1.1: use `asyncExec` with a `CompletableFuture` and a 30 s limit,
+  then return an error if a modal dialog blocks the UI thread.
+
+### 1.3 Finding the active model (`ModelLocator`, implemented)
+1. Use the active editor if it is an `org.eclipse.papyrus.infra.ui.editor.IMultiDiagramEditor`.
+2. Otherwise use the first restored Papyrus editor in any window.
+3. From the editor, `getServicesRegistry()` gives:
+   * `ModelSet` (the ResourceSet holding .di, .uml, .notation and .aird)
+   * the `TransactionalEditingDomain`
+   * `UmlModel.lookupRoot()`, the root `Package`
+4. Phase 2 adds an optional `model` argument to every tool (resource URI or file name) and a
+   `list_open_models` tool, for when more than one model is open.
+5. **Element ids** are the XMI ids (`resource.getURIFragment(e)`). They stay the same across save
+   and reload, and they match the ids in the existing `papyrus-out` files.
+
+## 2. Undo semantics
+* Write tools build commands through the **Papyrus Element Edit Service** (`ElementEditServiceUtils
+  .getCommandProvider(container).getEditCommand(new CreateElementRequest(domain, container,
+  UMLElementTypes.CLASS))`), then wrap them with `GMFtoEMFCommandWrapper`. This keeps Papyrus
+  advice running: default names, stereotype rules, and cleanup of related elements and views on
+  delete. It also matches what the palette and Model Explorer do.
+* For plain property sets with no edit-helper (for example `set_property` on a simple attribute),
+  use a `SetRequest` through the same service. Use raw EMF `SetCommand` only as a fallback.
+* Each tool call becomes one compound command with a readable label such as "MCP: create Class
+  Foo". Papyrus shows it in the Edit menu as "Undo MCP: create Class Foo".
+* The `undo` and `redo` tools call `commandStack.undo()` / `redo()`. They only undo when the top
+  of the stack is an MCP command, unless `force=true`. This stops a bot from undoing the user's
+  own edits.
+* A command that fails or throws is rolled back by the transaction, and the tool returns
+  `isError:true` with the message.
+
+## 3. Diagram creation and layout (GMF classic)
+What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
+`papy_templates.json`, `gmf_report.json`, all 15 diagrams checked in Papyrus 7.1):
+* Diagram types: `PapyrusUMLClassDiagram`, `UseCase`, `PapyrusUMLActivityDiagram`,
+  `PapyrusUMLStateMachineDiagram`, `PapyrusUMLComponentDiagram`, and others. Each needs a
+  `PapyrusDiagramStyle` with `diagramKindId` and `owner`, plus
+  `diagram_compatibility_version=1.4.0`.
+* View types are the Papyrus 7 semantic hints, not numeric visualIDs: `Class_Shape`,
+  `Actor_Shape`, `UseCase_Shape`, `Association_Edge`, and so on. `papy_templates.json` has the
+  exact child compartments and labels for each shape in each diagram kind.
+* `.di` pages are optional. Papyrus finds GMF diagrams through `PapyrusDiagramStyle.owner`.
+
+**At runtime we do not write the notation by hand** (that was the offline generator). Instead:
+* **create_diagram:** use the Papyrus `ViewPrototype` / `PolicyChecker` API (`org.eclipse.papyrus
+  .infra.gmfdiag.common` and `infra.viewpoints.policy`) with the diagram kind id, for example
+  `org.eclipse.papyrus.uml.diagram.class`, plus owner and name. This creates the Diagram, its
+  style, and the sash page, all inside a command.
+* **add_to_diagram (elements):** open or activate the diagram, get its `DiagramEditPart`, and send
+  a `CreateViewRequest` with `ViewDescriptor(new EObjectAdapter(elem), Node.class,
+  "Class_Shape"/null, prefHint)`. Papyrus works out the hint if we leave it out. Execute through
+  the diagram's `DiagramCommandStack`, which shares the same TransactionalEditingDomain, so it is
+  still one undo step.
+* **Edges:** for elements already on the diagram, use Papyrus's
+  `ShowHideRelatedLinkEditPolicy` / `ShowHideRelatedLinkRequest`, which draws every existing
+  relationship between the shown nodes (`add_relationships_to_diagram`).
+* **Layout:** there are two modes.
+  * `layout="gmf"` runs the GMF `ArrangeRequest(ActionIds.ACTION_ARRANGE_ALL)`. It is built in and
+    gives fair results.
+  * `layout="graphviz"` reuses the `gen_notation.py` approach: call `dot -Tplain` (it is installed
+    on the box; on the user's machine we check for it and fall back to gmf), then apply the
+    positions with `SetBoundsCommand`, all in one compound command. This gave the good results in
+    papyrus-out (LR rank for domain diagrams, a grid for use cases).
+* Shapes can also be given explicit `x,y,w,h`.
+* Sirius (`.aird`) diagrams are out of scope for v1. The tools refuse Sirius representations
+  with a clear message.
+
+## 4. Tool list (v1)
+`id` = XMI id. Most tools accept an optional `model` argument (Phase 2).
+
+| # | Tool | Params | Kind |
+|---|---|---|---|
+| 1 | `ping` ✅ | – | read |
+| 2 | `list_packages` ✅ | `model?` | read |
+| 3 | `list_open_models` | – | read |
+| 4 | `get_element` | `id` or `qualifiedName`; `depth?=1`; `include?=[properties,comments,stereotypes,relationships]` | read |
+| 5 | `list_elements` | `container`(id/qn), `metaclass?`, `recursive?=false`, `limit?=200`, `offset?` | read |
+| 6 | `find_elements` | `query` (name substring or regex), `metaclass?`, `stereotype?`, `limit?` | read |
+| 7 | `get_relationships` | `id`, `kind?` (Association/Generalization/Dependency/...), `direction?` | read |
+| 8 | `get_stereotypes` | `id` → applied stereotypes plus tagged values; or `profile?` → what can be applied | read |
+| 9 | `list_diagrams` | `owner?` → id, name, type, owner, elementCount (GMF and Sirius, flagged) | read |
+| 10 | `create_element` | `container`, `metaclass` (Class, Interface, Enumeration, Package, Actor, UseCase, Component, DataType, Signal, Activity, StateMachine, Comment, Constraint...), `name`, `properties?` | write |
+| 11 | `create_relationship` | `metaclass` (Association, Generalization, Dependency, Realization, Usage, Include, Extend, InterfaceRealization...), `source`, `target`, `name?`, `ends?{navigable, aggregation, multiplicity}` | write |
+| 12 | `add_property` / `add_operation` | `classifier`, `name`, `type?`, `multiplicity?`, `visibility?`, `params?`, `returnType?` | write |
+| 13 | `add_enumeration_literal` | `enumeration`, `name` | write |
+| 14 | `update_element` | `id`, `set{feature: value}` (name, visibility, isAbstract, type, lower/upper, body...) | write |
+| 15 | `set_comment` | `id`, `body`, `replace?` (annotates the element with an owned Comment) | write |
+| 16 | `apply_stereotype` / `unapply_stereotype` | `id`, `stereotype` (qn), `values?{tag:value}` | write |
+| 17 | `apply_profile` | `package`, `profile` (URI or registered name) | write |
+| 18 | `move_element` | `id`, `newContainer` | write |
+| 19 | `delete_elements` | `ids[]`, `dryRun?` (dry run reports what would be deleted, including views) | write |
+| 20 | `batch` | `operations[]` (any write tools) → **one** undo step, ids from earlier ops usable as `$1`,`$2` | write |
+| 21 | `create_diagram` | `kind` (class, usecase, activity, statemachine, component, package), `owner`, `name`, `open?=true` | write |
+| 22 | `add_to_diagram` | `diagram`, `elements[]` (`{id, x?,y?,w?,h?}`), `withRelationships?=true` | write |
+| 23 | `remove_from_diagram` | `diagram`, `elements[]` (view only; the model is untouched) | write |
+| 24 | `layout_diagram` | `diagram`, `algorithm?=gmf\|graphviz`, `rankdir?=LR` | write |
+| 25 | `export_diagram_image` | `diagram`, `format?=png\|svg` → base64 image content (so the bot can look at its work) | read |
+| 26 | `validate` | `id?` (default root), `severity?` → list of `{severity, message, elementId, source}` | read* |
+| 27 | `undo` / `redo` | `force?=false` | write |
+| 28 | `save` | `model?` → `editor.doSave()` | write |
+| 29 | `get_selection` | – → the elements selected in the Model Explorer or diagram, so the user can point at things | read |
+
+*`validate` changes only markers, never the model.
+
+## 5. Validation
+* Use `org.eclipse.papyrus.uml.service.validation`, or EMF `Diagnostician` directly through
+  Papyrus's `EValidator` registry on the ModelSet, which includes the EMF Validation framework
+  constraints and the UML2 OCL constraints.
+* Run it on the UI thread inside `runExclusive`. Return a flat list. Optionally
+  (`createMarkers=true`) also create Problems-view markers the same way Papyrus's own
+  "Validate Model" action does.
+
+## 6. Security
+* Bind only to `InetAddress.getLoopbackAddress()` (127.0.0.1). Never 0.0.0.0. Default port is
+  **7341**. You can change it under Preferences > Papyrus MCP, or with `-Dpapyrus.mcp.port`.
+* **Origin check** (the MCP spec requires DNS-rebinding protection): requests with no Origin, or
+  an http(s) Origin on localhost/127.0.0.1/[::1], are allowed. All others get 403.
+* **Optional Bearer token.** It is compared in constant time. If it is empty, no token is needed,
+  but the loopback-only and Origin rules still apply. We recommend setting one: any local process
+  can otherwise reach the port.
+* A **read-only mode** preference refuses all write tools.
+* There is no file-system tool. The bot cannot open or save arbitrary paths, only `save` the
+  already-open model. This also means the user's model files are only changed when the user or the
+  bot saves.
+* Phase 5: a status-bar indicator that shows the server is on, and an optional "confirm each
+  write" dialog.
+
+## 7. Build
+* **Now:** `org.papyrus.mcp/build.sh` uses plain `javac` against the installed
+  `Papyrus/plugins/*.jar` and produces a dropins jar. This works today.
+* **Later:** Maven Tycho 4.x with a target platform of the Papyrus 7.1 p2 repo
+  (`https://download.eclipse.org/modeling/mdt/papyrus/papyrus-desktop/updates/releases/2025-06/`)
+  plus Eclipse 2025-06, and a feature plus update-site project, so it can be installed with
+  Help > Install New Software.
+* We add bundles to `Require-Bundle` only as the phases need them:
+  `org.eclipse.papyrus.infra.services.edit`, `org.eclipse.papyrus.uml.service.types`,
+  `org.eclipse.gmf.runtime.diagram.ui`, `org.eclipse.papyrus.infra.gmfdiag.common`,
+  `org.eclipse.papyrus.uml.service.validation`, `org.eclipse.emf.validation`.
+
+## 8. Phased build order
+1. **Phase 1 (done):** server, auth, preferences, ModelLocator, `ping`, `list_packages`.
+2. **Phase 2 (read):** `get_element`, `list_elements`, `find_elements`, `get_relationships`,
+   `get_stereotypes`, `list_diagrams`, `get_selection`, `list_open_models`. Also the shared JSON
+   serializer for elements and the UI timeout wrapper.
+3. **Phase 3 (write):** the command helper (`McpCommands.run(label, ...)`), `create_element`,
+   `create_relationship`, `add_property/operation/literal`, `update_element`, `set_comment`,
+   `delete_elements`, `move_element`, `undo/redo`, `save`, `batch`.
+4. **Phase 4 (stereotypes and validation):** `apply_profile`, `apply/unapply_stereotype` with
+   tagged values, `validate`.
+5. **Phase 5 (diagrams):** `create_diagram`, `add_to_diagram`, `remove_from_diagram`,
+   `layout_diagram` (gmf, then graphviz), `export_diagram_image`.
+6. **Phase 6:** Tycho build, update site, SSE progress, confirm-writes option. Sirius diagram
+   tools (v2).
+
+## 9. Risks
+* **UI thread blocking:** a modal dialog stops `syncExec`. Mitigation: the timeout wrapper. Write
+  tools must also never open dialogs: use Papyrus requests with no UI and set
+  `IEditCommandRequest.setParameter("ui.mode", false)` where advices ask the user.
+* **Papyrus internal APIs** (`ViewPrototype`, policy checker, `ShowHideRelatedLink`) are not
+  stable API and may change in 7.2+. We keep them behind one `DiagramService` class.
+* **Lazily restored editors:** `getEditor(false)` returns null until the user clicks the tab. The
+  bot is then told "no model open". `list_open_models` will show restorable editors.
+* **Several models open:** the active editor is picked by default, so the bot could edit the
+  wrong model. Mitigation: the `model` argument, and every write result echoes the model URI.
+* **Large models:** `list_elements` has paging (limit/offset), and output sizes have a limit.
+* **Graphviz** may be missing on the user's machine: fall back to GMF arrange.
+* **Security:** the port is reachable by any local process when no token is set. Recommend a token.
+* **The MCP spec changes over time:** the protocol code is in one ~200-line class, and
+  `protocolVersion` is negotiated in `initialize`.
+* **Client support:** some MCP clients only speak stdio. Bridge with
+  `npx mcp-remote http://127.0.0.1:7341/mcp`.

@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Papyrus MCP Server
+Bundle-SymbolicName: org.papyrus.mcp;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Bundle-Vendor: youdontknowcrap
+Bundle-Activator: org.papyrus.mcp.Activator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Automatic-Module-Name: org.papyrus.mcp
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.workbench,
+ org.eclipse.ui.ide,
+ org.eclipse.jface,
+ org.eclipse.swt,
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.common,
+ org.eclipse.emf.transaction,
+ org.eclipse.uml2.uml,
+ org.eclipse.papyrus.infra.core,
+ org.eclipse.papyrus.infra.core.sasheditor,
+ org.eclipse.papyrus.infra.emf,
+ org.eclipse.papyrus.infra.ui,
+ org.eclipse.papyrus.uml.tools,
+ com.google.gson
+Import-Package: com.sun.net.httpserver
