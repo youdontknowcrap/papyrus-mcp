@@ -126,25 +126,25 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
 | 7 | `get_relationships` ✅ | `id`, `kind?` (Association/Generalization/Dependency/...), `direction?` | read |
 | 8 | `get_stereotypes` ✅ | `id` → applied stereotypes plus tagged values; or `profile?` → what can be applied | read |
 | 9 | `list_diagrams` ✅ | `owner?` → id, name, type, owner, elementCount (GMF and Sirius, flagged) | read |
-| 10 | `create_element` | `container`, `metaclass` (Class, Interface, Enumeration, Package, Actor, UseCase, Component, DataType, Signal, Activity, StateMachine, Comment, Constraint...), `name`, `properties?` | write |
-| 11 | `create_relationship` | `metaclass` (Association, Generalization, Dependency, Realization, Usage, Include, Extend, InterfaceRealization...), `source`, `target`, `name?`, `ends?{navigable, aggregation, multiplicity}` | write |
-| 12 | `add_property` / `add_operation` | `classifier`, `name`, `type?`, `multiplicity?`, `visibility?`, `params?`, `returnType?` | write |
-| 13 | `add_enumeration_literal` | `enumeration`, `name` | write |
-| 14 | `update_element` | `id`, `set{feature: value}` (name, visibility, isAbstract, type, lower/upper, body...) | write |
-| 15 | `set_comment` | `id`, `body`, `replace?` (annotates the element with an owned Comment) | write |
+| 10 | `create_element` ✅ | `container`, `metaclass` (Class, Interface, Enumeration, Package, Actor, UseCase, Component, DataType, Signal, Activity, StateMachine, Comment, Constraint...), `name`, `properties?` | write |
+| 11 | `create_relationship` ✅ | `metaclass` (Association, Generalization, Dependency, Realization, Usage, Include, Extend, InterfaceRealization...), `source`, `target`, `name?`, `ends?{navigable, aggregation, multiplicity}` | write |
+| 12 | `add_property` / `add_operation` ✅ | `classifier`, `name`, `type?`, `multiplicity?`, `visibility?`, `params?`, `returnType?` | write |
+| 13 | `add_enumeration_literal` ✅ | `enumeration`, `name` | write |
+| 14 | `update_element` ✅ | `id`, `set{feature: value}` (name, visibility, isAbstract, type, lower/upper, body...) | write |
+| 15 | `set_comment` ✅ | `id`, `body`, `replace?` (annotates the element with an owned Comment) | write |
 | 16 | `apply_stereotype` / `unapply_stereotype` | `id`, `stereotype` (qn), `values?{tag:value}` | write |
 | 17 | `apply_profile` | `package`, `profile` (URI or registered name) | write |
-| 18 | `move_element` | `id`, `newContainer` | write |
-| 19 | `delete_elements` | `ids[]`, `dryRun?` (dry run reports what would be deleted, including views) | write |
-| 20 | `batch` | `operations[]` (any write tools) → **one** undo step, ids from earlier ops usable as `$1`,`$2` | write |
+| 18 | `move_element` ✅ | `id`, `newContainer` | write |
+| 19 | `delete_elements` ✅ | `ids[]`, `dryRun?` (dry run reports what would be deleted, including views) | write |
+| 20 | `batch` ✅ | `operations[]` (any write tools) → **one** undo step, ids from earlier ops usable as `$1`,`$2` | write |
 | 21 | `create_diagram` | `kind` (class, usecase, activity, statemachine, component, package), `owner`, `name`, `open?=true` | write |
 | 22 | `add_to_diagram` | `diagram`, `elements[]` (`{id, x?,y?,w?,h?}`), `withRelationships?=true` | write |
 | 23 | `remove_from_diagram` | `diagram`, `elements[]` (view only; the model is untouched) | write |
 | 24 | `layout_diagram` | `diagram`, `algorithm?=gmf\|graphviz`, `rankdir?=LR` | write |
 | 25 | `export_diagram_image` | `diagram`, `format?=png\|svg` → base64 image content (so the bot can look at its work) | read |
 | 26 | `validate` | `id?` (default root), `severity?` → list of `{severity, message, elementId, source}` | read* |
-| 27 | `undo` / `redo` | `force?=false` | write |
-| 28 | `save` | `model?` → `editor.doSave()` | write |
+| 27 | `undo` / `redo` ✅ | `force?=false` | write |
+| 28 | `save` ✅ | `model?` → `editor.doSave()` | write |
 | 29 | `get_selection` ✅ | – → the elements selected in the Model Explorer or diagram, so the user can point at things | read |
 
 | 30 | `get_changelog` ✅ | `since_seq?` (omit = this session's cursor), `client?` | read |
@@ -195,7 +195,7 @@ See §10.
    `get_relationships`, `get_stereotypes`, `list_diagrams`, `get_selection`, `list_open_models`.
    Also the multi-client changelog (`get_changelog`), sessions, model version and etags, and
    `WriteSupport`. Still open: the UI timeout wrapper.
-3. **Phase 3 (write):** the command helper (`McpCommands.run(label, ...)`), `create_element`,
+3. **Phase 3 (write) (done, tested live 2026-10-16; see §13):** the command helper (`McpCommands.run(label, ...)`), `create_element`,
    `create_relationship`, `add_property/operation/literal`, `update_element`, `set_comment`,
    `delete_elements`, `move_element`, `undo/redo`, `save`, `batch`.
 4. **Phase 4 (stereotypes and validation):** `apply_profile`, `apply/unapply_stereotype` with
@@ -302,3 +302,58 @@ exactly what the remote bot did.
   `mcp-test` and opens the .di with `IDE.openEditor`. `--launcher.openFile` did not work.
 * `test/smoke.py` acts as two clients (grok-build and grok-bot) and covers every read tool, the
   changelog, the cursors and stale edits. Its output is saved in `test/smoke-output.txt`.
+
+## 13. Phase 3 as built: edit tools, undo, timeout
+* **One command per call.** Each write becomes one `McpCommand`, which is an EMF
+  `RecordingCommand`. Inside it we use plain UML2 API calls, and we also run Papyrus
+  edit-service `ICommand`s directly. Everything is recorded into one ChangeDescription, so one
+  Ctrl+Z reverts the whole tool call or batch.
+* **Errors.** An error inside the command sets `OperationCanceledException`, which rolls the
+  transaction back. Nothing reaches the undo history, and there is no changelog entry.
+* **What goes through the Papyrus edit service** (`util/EditService`), so Papyrus advice runs:
+  * `create_element`, using `CreateElementRequest` with type `org.eclipse.papyrus.uml.<Metaclass>`
+  * `move_element` (`MoveRequest`)
+  * `delete_elements` (`DestroyElementRequest`), which also removes the diagram views
+  * If the service has no command, each one falls back to EMF.
+* **What uses the UML2 API directly** (predictable owners): relationships, properties,
+  operations, literals and comments.
+  * Association: `source.createAssociation(...)`. The end named "target" is the end typed by
+    the target and is navigable by default.
+  * Dependency family: owned by the source's nearest package.
+  * Include/Extend: owned by the use case.
+  * Flows: owned by the activity.
+  * Transition: owned by the source vertex's region.
+* **`update_element`** sets any changeable, non-derived, non-containment feature by name.
+  Enum values are given as literals, references as id or qualified name.
+  * Convenience keys: `multiplicity`, `lower`, `upper`, `type`, `body`, `default`, `specification`.
+  * Primitive types resolve by qualified name, for example `PrimitiveTypes::Integer`.
+* **`delete_elements` with `dry_run`** is read-only. It reports:
+  * the owned elements that would also be deleted
+  * affected relationships
+  * other elements that reference them
+  * how many diagram views would be removed
+* **`batch`** applies `operations[{tool, arguments}]` inside one command. `"$N"` means the id
+  created by operation N. A failure anywhere rolls back the whole batch.
+* **`undo` / `redo`**:
+  * By default they act only if the top of the stack is an `McpCommand` from this session.
+  * `scope=mcp` allows any bot's edit. `force=true` allows anything, including the user's edits.
+  * Each one is written to the changelog.
+* **`save`** calls `editor.doSave`.
+* **UI timeout** (`UiSync`): requests are posted with `asyncExec` and waited on a future, for
+  `-Dpapyrus.mcp.uiTimeoutMs` (default 30000).
+  * If the request has not started when the timeout hits, it is cancelled and never runs:
+    "UI thread is busy".
+  * If it started but did not finish, the bot is told it may still complete and should check
+    the changelog.
+  * Reads still work while a dialog is open, because asyncExec runs inside modal loops.
+    **Writes, undo, redo and save are refused while a modal dialog is open.**
+* **Tests** (box, live Papyrus 7.1, original file names so notation refs resolve):
+  * `test/smoke_edit.py`: all edit tools, stale etag and stale version, undo ownership,
+    delete/undo, batch with `$refs`, batch rollback, one-step undo of a batch, save.
+  * `test/smoke_timeout.py`: dialog refusal and both timeout paths. It uses test-only
+    `debug_block_ui` and `debug_open_dialog`, which only exist with
+    `-Dpapyrus.mcp.debugTools=true`.
+  * Outputs are in `test/*-output.txt`.
+* **Laptop:** `test/laptop-launch.sh` uses a throwaway `/tmp/papyrus-mcp-cfg` and loads the jar
+  through `osgi.bundles`, so the install folder is never written. `test/laptop-smoke.sh` runs
+  curl initialize, ping and list_packages.

@@ -23,12 +23,31 @@ public class ToolRegistry {
         r.add(new ListDiagramsTool());
         r.add(new GetSelectionTool());
         r.add(new GetChangelogTool());
-        if (Boolean.getBoolean("papyrus.mcp.debugTools")) r.add(new DebugRenameTool()); // test-only
-        // Phase 3: write tools go through util.WriteSupport (version check + changelog). See DESIGN.md.
+        // Phase 3: edit tools. All go through util.WriteSupport (dialog check, staleness check,
+        // one undo step, changelog entry).
+        r.add(new CreateElementTool());
+        r.add(new CreateRelationshipTool());
+        r.add(new AddPropertyTool());
+        r.add(new AddOperationTool());
+        r.add(new AddEnumerationLiteralTool());
+        r.add(new UpdateElementTool());
+        r.add(new SetCommentTool());
+        r.add(new MoveElementTool());
+        r.add(new DeleteElementsTool());
+        r.add(new BatchTool(r));
+        r.add(new UndoRedoTool(true));
+        r.add(new UndoRedoTool(false));
+        r.add(new SaveTool());
+        if (Boolean.getBoolean("papyrus.mcp.debugTools")) { // test-only, see DebugTools.java
+            r.add(new DebugBlockUiTool());
+            r.add(new DebugOpenDialogTool());
+        }
         return r;
     }
 
     public void add(Tool t) { tools.put(t.name(), t); }
+
+    public Tool get(String name) { return tools.get(name); }
 
     public JsonArray describeAll() {
         JsonArray a = new JsonArray();

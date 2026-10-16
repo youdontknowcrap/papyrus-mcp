@@ -24,6 +24,14 @@ You need one file: `org.papyrus.mcp_0.1.0.<date>.jar`. It is in `org.papyrus.mcp
 6. Optional: go to Window > Preferences > Papyrus MCP to set a port or token. Restart Papyrus
    after changing them.
 
+## A2. Alternative: test without touching the Papyrus install (Linux)
+```
+bash /home/rambo/SYSML/papyrus-mcp/test/laptop-launch.sh     # starts Papyrus with the plugin
+# open your model in Papyrus, then in a second terminal:
+bash /home/rambo/SYSML/papyrus-mcp/test/laptop-smoke.sh      # ping + list_packages
+```
+Both scripts take `PAPYRUS=...`, `JARDIR=...`, `PORT=...`, `TOKEN=...` if your paths differ.
+
 ## B. Connect your AI client
 - Clients that support HTTP MCP: use the server URL `http://127.0.0.1:7341/mcp`. If you set a
   token, also add the header `Authorization: Bearer <token>`.

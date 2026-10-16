@@ -1,57 +1,36 @@
 
 ### tools/list
-["ping", "list_open_models", "list_packages", "get_element", "list_elements", "find_elements", "get_relationships", "get_stereotypes", "list_diagrams", "get_selection", "get_changelog", "debug_rename"]
+["ping", "list_open_models", "list_packages", "get_element", "list_elements", "find_elements", "get_relationships", "get_stereotypes", "list_diagrams", "get_selection", "get_changelog", "create_element", "create_relationship", "add_property", "add_operation", "add_enumeration_literal", "update_element", "set_comment", "move_element", "delete_elements", "batch", "undo", "redo", "save", "debug_block_ui", "debug_open_dialog"]
 
 ### list_open_models
-{"models": [{"title": "model.di", "restored": true, "model": "platform:/resource/mcp-test/model.uml", "rootName": "MudHut Opener Am", "modelVersion": 0, "dirty": false, "active": true}]}
+{"models": [{"title": "MudHut Opener Am..di", "restored": true, "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "rootName": "MudHut Opener Am", "modelVersion": 18, "dirty": false, "active": true}]}
 
 ### list_packages
 {"packages": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am", "ownedElementCount": 30, "children": [{"id": "_mh_pkg_0003", "metaclass": "Package", "name": "Vocabulary", "qualifiedName": "MudHut Opener Am::Vocabulary", "ownedElementCount": 8, "children": []}, {"id": "_mh_pkg_0093", "metaclass": "Package", "name": "System User Goals", "qualifiedName": "MudHut Opener Am::System User Goals", "ownedElementCount": 48, "children": 
 
 ### find_elements Scene/Class
-{"total": 2, "elements": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, {"id": "_mh_sm_0593", "metaclass": "StateMachine", "name": "Scene States", "qualifiedName": "MudHut Opener Am::Domain::Scene::Scene States"}], "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
+{"total": 2, "elements": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, {"id": "_mh_sm_0593", "metaclass": "StateMachine", "name": "Scene States", "qualifiedName": "MudHut Opener Am::Domain::Scene::Scene States"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
 
 ### get_element
-{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "478580d03ca8", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "properties": {"name": "Scene"}, "comments": [{"id": "_mh_cmt_0468", "body": "Owned behavior is the per-scene machine. A scene may be created already slated by the opening. A later scene may sit unslated with no setting.", "owned": true}], "stereotypes": [], "relationships": [{"id": "_mh_asc_0663", "metaclass": "Association", "name": "Production has scenes", "qualifiedName": "MudHut Opener Am::Domain::Production has scenes", "ends": [{"id": "_mh_end_0664", "name": "production", "type": {"id": "_mh_cls_0433", "metaclass": "Class", "name": "Production", "qualifiedName": "MudHut Opener Am::Domain::Production"}, "navigable": false, "aggregation": "none", "multiplicity": "1..1"}, {"id": "_mh_end_0665", "name": "scene", "type": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "navigable": false, "aggregation": "none", "multiplicity": "0..*"}], "direction": "
+{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "9835b08c9df0", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "properties": {"name": "Scene"}, "comments": [{"id": "_mh_cmt_0468", "body": "Owned behavior is the per-scene machine. A scene may be created already slated by the opening. A later scene may sit unslated with no setting.", "owned": true}], "stereotypes": [], "relationships": [{"id": "_xYhBYMmUEfGWCKeBqnyQzg", "metaclass": "Generalization", "sources": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "targets": [{"id": "_xXUukMmUEfGWCKeBqnyQzg", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "direction": "out"}, {"id": "_mh_asc_0663", "metaclass": "Association", "name": "Production has scenes", "qualifiedName": "MudHut Opener Am::Domain::Production has scenes", "ends": [{"id": "_mh_end_0664", "name": "production", "type": {"id": "_mh_cls_0433", "metaclass": "Class", "name": "Production", "qualifiedN
 
 ### get_relationships
-{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "relationships": [{"id": "_mh_asc_0663", "metaclass": "Association", "name": "Production has scenes", "qualifiedName": "MudHut Opener Am::Domain::Production has scenes", "ends": [{"id": "_mh_end_0664", "name": "production", "type": {"id": "_mh_cls_0433", "metaclass": "Class", "name": "Production", "qualifiedName": "MudHut Opener Am::Domain::Production"}, "navigable": false, "aggregation": "none", "multiplicity": "1..1"}, {"id": "_mh_end_0665", "name": "scene", "type": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "navigable": false, "aggregation": "none", "multiplicity": "0..*"}], "direction": "bo
+{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "relationships": [{"id": "_xYhBYMmUEfGWCKeBqnyQzg", "metaclass": "Generalization", "sources": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "targets": [{"id": "_xXUukMmUEfGWCKeBqnyQzg", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "direction": "out"}, {"id": "_mh_asc_0663", "metaclass": "Association", "name": "Production has scenes", "qualifiedName": "MudHut Opener Am::Domain::Production has scenes", "ends": [{"id": "_mh_end_0664", "name": "production", "type": {"id": "_mh_cls_0433", "metaclass": "Class", "name": "Production", "qualifiedNam
 
 ### list_elements recursive Association
-{"container": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am"}, "total": 96, "offset": 0, "elements": [{"id": "_mh_asc_0095", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}, {"id": "_mh_asc_0102", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}, {"id": "_mh_asc_0109", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}], "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
+{"container": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am"}, "total": 97, "offset": 0, "elements": [{"id": "_mh_asc_0095", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}, {"id": "_mh_asc_0102", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}, {"id": "_mh_asc_0109", "metaclass": "Association", "name": "User plays", "qualifiedName": "MudHut Opener Am::System User Goals::User plays"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
 
 ### get_stereotypes (model)
-{"appliedProfiles": [], "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
+{"appliedProfiles": [], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
 
 ### get_stereotypes (element)
-{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "applied": [], "applicable": [], "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
+{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "applied": [], "applicable": [], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
 
 ### list_diagrams
-{"count": 20, "first": [{"id": "_t9tRwMlwEfGvWLiqtIhhHw", "name": "Onboarding", "framework": "gmf", "type": "PapyrusUMLActivityDiagram", "kind": "org.eclipse.papyrus.uml.diagram.activity", "owner": {"metaclass": "EObject", "unresolvedProxy": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml#_tsHLcMlwEfGvWLiqtIhhHw"}, "context": {"metaclass": "EObject", "unresolvedProxy": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml#_t9iSoMlwEfGvWLiqtIhhHw"}, "nodeCount": 1, "edgeCount": 16}, {"id": "_mhgmf000535", "name": "GMF - Use cases - all", "framework": "gmf", "type": "UseCase", "kind": "org.eclipse.papyrus.uml.diagram.useCase", "owner": {"metaclass": "Model", "unresolvedProxy": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml#_tsHLcMlwEfGvWLiqtIhhHw"}, "context": {"metaclass": "Model", "unresolvedProxy": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml#_tsHLcMlwEfGvWLiqt
+{"count": 20, "first": [{"id": "_t9tRwMlwEfGvWLiqtIhhHw", "name": "Onboarding", "framework": "gmf", "type": "PapyrusUMLActivityDiagram", "kind": "org.eclipse.papyrus.uml.diagram.activity", "owner": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am"}, "context": {"id": "_t9iSoMlwEfGvWLiqtIhhHw", "metaclass": "Activity", "name": "Onboarding", "qualifiedName": "MudHut Opener Am::Onboarding"}, "nodeCount": 1, "edgeCount": 16}, {"id": "_mhgmf000535", "name": "GMF - Use cases - all", "framework": "gmf", "type": "UseCase", "kind": "org.eclipse.papyrus.uml.diagram.useCase", "owner": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am"}, "context": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener 
 
 ### get_selection
-{"selection": [], "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
+{"selection": [], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
 
 ### get_element by qualifiedName
-{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "478580d03ca8", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}}, "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 0}
-
-### A rename (expected_version ok)
-{"seq": 1, "undoLabel": "MCP: rename Scene -> SceneX", "modelVersion": 1, "etag": "a3cdc77bb4d6"}
-
-### B rename with stale expected_version
-"ERROR: StaleEditException: stale edit: model version is 1, expected 0. Re-read (get_changelog / get_element) and retry."
-
-### B rename with stale etag
-"ERROR: StaleEditException: stale edit: element _mh_cls_0467 changed (etag a3cdc77bb4d6)"
-
-### B rename back (no check)
-{"seq": 2, "undoLabel": "MCP: rename SceneX -> Scene", "modelVersion": 2, "etag": "478580d03ca8"}
-
-### A get_changelog (cursor)
-{"entries": [{"seq": 1, "timestamp": "2026-10-16T18:26:34.943618401Z", "model": "platform:/resource/mcp-test/model.uml", "client": "grok-build/1.0#e8a484b9", "sessionId": "e8a484b9-b47e-425c-9cd1-8814dc5f991e", "tool": "debug_rename", "summary": "rename 'Scene' to 'SceneX'", "undoLabel": "MCP: rename Scene -> SceneX", "elementIds": ["_mh_cls_0467"], "versionBefore": 0, "versionAfter": 1}, {"seq": 2, "timestamp": "2026-10-16T18:26:34.970689073Z", "model": "platform:/resource/mcp-test/model.uml", "client": "grok-bot/1.0#11f24c09", "sessionId": "11f24c09-a87d-4925-b7c0-15fb7dc80954", "tool": "debug_rename", "summary": "rename 'SceneX' to 'Scene'", "undoLabel": "MCP: rename SceneX -> Scene", "elementIds": ["_mh_cls_0467"], "versionBefore": 1, "versionAfter": 2}], "cursor": 2, "you": "grok-build/1.0#e8a484b9", "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 2}
-
-### A get_changelog again (cursor -> empty)
-{"entries": [], "cursor": 2, "you": "grok-build/1.0#e8a484b9", "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 2}
-
-### B get_changelog client=grok-build since 0
-{"entries": [{"seq": 1, "timestamp": "2026-10-16T18:26:34.943618401Z", "model": "platform:/resource/mcp-test/model.uml", "client": "grok-build/1.0#e8a484b9", "sessionId": "e8a484b9-b47e-425c-9cd1-8814dc5f991e", "tool": "debug_rename", "summary": "rename 'Scene' to 'SceneX'", "undoLabel": "MCP: rename Scene -> SceneX", "elementIds": ["_mh_cls_0467"], "versionBefore": 0, "versionAfter": 1}], "cursor": 1, "you": "grok-bot/1.0#11f24c09", "model": "platform:/resource/mcp-test/model.uml", "modelVersion": 2}
+{"element": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "9835b08c9df0", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}}, "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}

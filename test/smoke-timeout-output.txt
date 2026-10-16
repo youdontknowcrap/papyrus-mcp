@@ -1,0 +1,26 @@
+
+### open modal dialog for 6 s
+{"opened": true}
+
+### write while modal open -> refused
+"ERROR: IllegalStateException: A dialog is open in Papyrus; close it and retry (edits are refused while a dialog is open)."
+
+### read while modal open -> works
+{"total": 1, "elements": [{"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 0}
+
+### write after dialog closed -> works
+{"id": "_o6ynIMmUEfGBcda6ar63Fw", "metaclass": "Class", "name": "AfterDialog", "qualifiedName": "MudHut Opener Am::AfterDialog", "etag": "70dffef570d4", "seq": 21, "undoLabel": "MCP: create Class AfterDialog", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 1}
+
+### undo it
+{"undone": "MCP: create Class AfterDialog", "seq": 22, "modelVersion": 2}
+
+### block UI 6 s with timeout 3 s -> started-but-unfinished
+"ERROR: TimeoutException: Operation started in Papyrus but did not finish within 3000 ms (a dialog may be waiting for the user). It may still complete: check get_changelog/modelVersion before retrying."
+took 3.0s
+
+### call while UI blocked -> cancelled, never runs
+"ERROR: TimeoutException: Papyrus UI thread is busy; the request was cancelled without running. Try again."
+took 3.0s
+
+### NeverRuns exists?
+{"total": 0, "elements": [], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 2}
