@@ -13,8 +13,18 @@ public class ToolRegistry {
     public static ToolRegistry createDefault() {
         ToolRegistry r = new ToolRegistry();
         r.add(new PingTool());
+        r.add(new ListOpenModelsTool());
         r.add(new ListPackagesTool());
-        // Phase 2+: GetElementTool, FindElementsTool, CreateElementTool, ... (see DESIGN.md §4)
+        r.add(new GetElementTool());
+        r.add(new ListElementsTool());
+        r.add(new FindElementsTool());
+        r.add(new GetRelationshipsTool());
+        r.add(new GetStereotypesTool());
+        r.add(new ListDiagramsTool());
+        r.add(new GetSelectionTool());
+        r.add(new GetChangelogTool());
+        if (Boolean.getBoolean("papyrus.mcp.debugTools")) r.add(new DebugRenameTool()); // test-only
+        // Phase 3: write tools go through util.WriteSupport (version check + changelog). See DESIGN.md.
         return r;
     }
 

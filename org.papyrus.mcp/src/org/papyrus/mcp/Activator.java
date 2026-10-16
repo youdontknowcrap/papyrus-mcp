@@ -26,6 +26,8 @@ public class Activator extends AbstractUIPlugin {
         if (!getPreferenceStore().getBoolean(Prefs.ENABLED)) return;
         int port = Integer.getInteger("papyrus.mcp.port", getPreferenceStore().getInt(Prefs.PORT));
         String token = System.getProperty("papyrus.mcp.token", getPreferenceStore().getString(Prefs.TOKEN));
+        org.papyrus.mcp.util.Changelog.get().setSidecar(Boolean.parseBoolean(System.getProperty(
+                "papyrus.mcp.changelogSidecar", String.valueOf(getPreferenceStore().getBoolean(Prefs.CHANGELOG_SIDECAR)))));
         server = new McpHttpServer(port, token, ToolRegistry.createDefault());
         try {
             server.start();

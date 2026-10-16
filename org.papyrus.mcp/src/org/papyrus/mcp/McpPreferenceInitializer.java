@@ -11,5 +11,6 @@ public class McpPreferenceInitializer extends AbstractPreferenceInitializer {
         s.setDefault(Prefs.PORT, 7341);
         s.setDefault(Prefs.TOKEN, "");
         s.setDefault(Prefs.READ_ONLY, false);
+        s.setDefault(Prefs.CHANGELOG_SIDECAR, false);
     }
 }

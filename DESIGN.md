@@ -119,13 +119,13 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
 |---|---|---|---|
 | 1 | `ping` ✅ | – | read |
 | 2 | `list_packages` ✅ | `model?` | read |
-| 3 | `list_open_models` | – | read |
-| 4 | `get_element` | `id` or `qualifiedName`; `depth?=1`; `include?=[properties,comments,stereotypes,relationships]` | read |
-| 5 | `list_elements` | `container`(id/qn), `metaclass?`, `recursive?=false`, `limit?=200`, `offset?` | read |
-| 6 | `find_elements` | `query` (name substring or regex), `metaclass?`, `stereotype?`, `limit?` | read |
-| 7 | `get_relationships` | `id`, `kind?` (Association/Generalization/Dependency/...), `direction?` | read |
-| 8 | `get_stereotypes` | `id` → applied stereotypes plus tagged values; or `profile?` → what can be applied | read |
-| 9 | `list_diagrams` | `owner?` → id, name, type, owner, elementCount (GMF and Sirius, flagged) | read |
+| 3 | `list_open_models` ✅ | – | read |
+| 4 | `get_element` ✅ | `id` or `qualifiedName`; `depth?=1`; `include?=[properties,comments,stereotypes,relationships]` | read |
+| 5 | `list_elements` ✅ | `container`(id/qn), `metaclass?`, `recursive?=false`, `limit?=200`, `offset?` | read |
+| 6 | `find_elements` ✅ | `query` (name substring or regex), `metaclass?`, `stereotype?`, `limit?` | read |
+| 7 | `get_relationships` ✅ | `id`, `kind?` (Association/Generalization/Dependency/...), `direction?` | read |
+| 8 | `get_stereotypes` ✅ | `id` → applied stereotypes plus tagged values; or `profile?` → what can be applied | read |
+| 9 | `list_diagrams` ✅ | `owner?` → id, name, type, owner, elementCount (GMF and Sirius, flagged) | read |
 | 10 | `create_element` | `container`, `metaclass` (Class, Interface, Enumeration, Package, Actor, UseCase, Component, DataType, Signal, Activity, StateMachine, Comment, Constraint...), `name`, `properties?` | write |
 | 11 | `create_relationship` | `metaclass` (Association, Generalization, Dependency, Realization, Usage, Include, Extend, InterfaceRealization...), `source`, `target`, `name?`, `ends?{navigable, aggregation, multiplicity}` | write |
 | 12 | `add_property` / `add_operation` | `classifier`, `name`, `type?`, `multiplicity?`, `visibility?`, `params?`, `returnType?` | write |
@@ -145,9 +145,14 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
 | 26 | `validate` | `id?` (default root), `severity?` → list of `{severity, message, elementId, source}` | read* |
 | 27 | `undo` / `redo` | `force?=false` | write |
 | 28 | `save` | `model?` → `editor.doSave()` | write |
-| 29 | `get_selection` | – → the elements selected in the Model Explorer or diagram, so the user can point at things | read |
+| 29 | `get_selection` ✅ | – → the elements selected in the Model Explorer or diagram, so the user can point at things | read |
+
+| 30 | `get_changelog` ✅ | `since_seq?` (omit = this session's cursor), `client?` | read |
 
 *`validate` changes only markers, never the model.
+
+**All write tools** also accept `expected_version?` (integer) and `expected_etags?` (`{id: etag}`).
+See §10.
 
 ## 5. Validation
 * Use `org.eclipse.papyrus.uml.service.validation`, or EMF `Diagnostician` directly through
@@ -186,9 +191,10 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
 
 ## 8. Phased build order
 1. **Phase 1 (done):** server, auth, preferences, ModelLocator, `ping`, `list_packages`.
-2. **Phase 2 (read):** `get_element`, `list_elements`, `find_elements`, `get_relationships`,
-   `get_stereotypes`, `list_diagrams`, `get_selection`, `list_open_models`. Also the shared JSON
-   serializer for elements and the UI timeout wrapper.
+2. **Phase 2 (done, tested live 2026-10-16):** `get_element`, `list_elements`, `find_elements`,
+   `get_relationships`, `get_stereotypes`, `list_diagrams`, `get_selection`, `list_open_models`.
+   Also the multi-client changelog (`get_changelog`), sessions, model version and etags, and
+   `WriteSupport`. Still open: the UI timeout wrapper.
 3. **Phase 3 (write):** the command helper (`McpCommands.run(label, ...)`), `create_element`,
    `create_relationship`, `add_property/operation/literal`, `update_element`, `set_comment`,
    `delete_elements`, `move_element`, `undo/redo`, `save`, `batch`.
@@ -216,3 +222,83 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
   `protocolVersion` is negotiated in `initialize`.
 * **Client support:** some MCP clients only speak stdio. Bridge with
   `npx mcp-remote http://127.0.0.1:7341/mcp`.
+
+## 10. Multi-client changelog and stale-edit detection (implemented)
+* **Client identity.** `initialize` stores a `Session`: the id from the `Mcp-Session-Id` header,
+  plus `clientInfo.name` and `version`. Its label looks like `grok-build/1.0#e8a484b9`.
+  * Each `tools/call` finds its session from the header.
+  * A missing or unknown session is treated as `anonymous`. This lenient choice is kept for curl
+    testing; it can be made strict later.
+* **Changelog** (`util/Changelog`). Every successful write appends one entry, kept per model and
+  keyed by the .uml URI. Each entry has:
+  * `seq`: global and increasing
+  * `timestamp`: ISO, UTC
+  * `client` and `sessionId`
+  * `tool`
+  * `summary`
+  * `undoLabel`: exactly what Papyrus shows as "Undo …"
+  * `elementIds`
+  * `versionBefore` and `versionAfter`
+* **`get_changelog`.** Without `since_seq`, it returns the entries after this session's cursor,
+  then moves the cursor forward. This answers "what did the other bots change since I last
+  looked?". `since_seq=0` returns everything, and `client` filters by label.
+* **Sidecar file.** This is optional: the preference "Save MCP changelog next to the model", or
+  `-Dpapyrus.mcp.changelogSidecar=true`.
+  * The log is written to `<model>.mcp-changelog.json` next to the .uml, using a temp file and an
+    atomic move.
+  * It is reloaded when the model is first used.
+  * It is off by default, so the user's model folder gets no new files unless they opt in.
+* **Model version.** `ModelLocator` adds a `CommandStackListener` to each editing domain. Every
+  execute, undo or redo from **anyone** (bot or human) raises the version by one. Every read
+  result includes `modelVersion`. Human edits are not in the changelog; they only show up as a
+  version jump with no matching entry.
+* **Etags.** `get_element` returns `etag`: a 12-hex SHA-256 of the element's own non-derived
+  features and its applied stereotypes. It changes only when that element changes.
+* **Stale-edit check** (`WriteSupport.checkFresh`, used by every write tool):
+  * `expected_version` must equal the current version. This is strict: any change anywhere fails it.
+  * `expected_etags` must match for each listed element. This is fine-grained and recommended
+    for bots, so unrelated edits don't block them.
+  * On a mismatch the tool returns `isError` with "stale edit…". The bot should re-read and retry.
+* **The only allowed write path** is `WriteSupport.execute(session, model, args, tool, command,
+  summary, ids)`. It does the freshness check, then one `commandStack.execute` (one undo step),
+  then the changelog entry. Phase-3 tools must use it.
+* Test-only tool `debug_rename`, turned on by `-Dpapyrus.mcp.debugTools=true`, exercises this path.
+
+## 11. Clients and remote access
+Two clients are expected:
+1. **Grok Build desktop app**, on the same laptop as Papyrus. It connects directly to
+   `http://127.0.0.1:7341/mcp`. Nothing is exposed to the network.
+2. **Grok Bot**, which runs on a remote cloud box. It **cannot reach the laptop's localhost**, so
+   it needs a deliberate, authenticated path. Papyrus itself **keeps binding to 127.0.0.1**. We
+   never add a "listen on 0.0.0.0" option. The tunnel or proxy does the exposing.
+
+**Rule: when the server is reachable from anything other than the laptop itself, a token is
+mandatory.**
+* Plan (v1.1): a `requireToken` preference. Startup refuses a remote-access setup with no token.
+* The server rejects requests whose `Host` header is not loopback, unless `allowedHosts` (for
+  example the tailnet name) is configured **and** a token is set.
+* Use a long random token (for example `openssl rand -hex 32`). Put it in the Grok Bot MCP config
+  as `Authorization: Bearer …`. Rotate it from the preference page.
+
+| Option | How | Pros | Cons |
+|---|---|---|---|
+| **A. Tailscale (recommended)** | Laptop and cloud box join the same tailnet. On the laptop run `tailscale serve --bg --tcp 7341 tcp://127.0.0.1:7341` (or `--https=443 http://127.0.0.1:7341`). Grok Bot uses `https://<laptop>.<tailnet>.ts.net/mcp` plus the Bearer token. | WireGuard encryption, both devices identified, ACLs (tag the bot box and allow only that tag to reach the laptop on 7341), no public port, works behind NAT, `serve` (not `funnel`) stays private. | Tailscale must run on both machines. The cloud box needs an auth key. |
+| **B. SSH reverse tunnel** | From the laptop run `ssh -N -R 127.0.0.1:7341:127.0.0.1:7341 user@cloudbox` (add `autossh` to keep it alive). Grok Bot then calls `http://127.0.0.1:7341/mcp` **on the cloud box**. | No extra software. The port is loopback-only on the box too (keep `GatewayPorts no`). Easy to stop (close ssh). | The laptop needs SSH access to the box. The tunnel drops when the laptop sleeps. Any process on the cloud box can use the port, so the token matters. |
+| C. Cloudflare Tunnel or ngrok | Public HTTPS URL that forwards to localhost. | Simple. | **Public internet exposure.** Only acceptable with token plus Cloudflare Access/OAuth in front. Not recommended. |
+| D. Port-forward on router / bind 0.0.0.0 | – | – | **Never.** |
+
+**Recommendation:** use Tailscale with `tailscale serve`, a tailnet ACL that only lets the Grok Bot
+box reach `laptop:7341`, and a mandatory Bearer token. If Tailscale isn't wanted, use an SSH
+reverse tunnel. Read-only mode is a good first step for the remote bot. Every write the bot makes
+is still undoable in Papyrus, and the changelog tags it as `grok-bot/...`, so you can see and undo
+exactly what the remote bot did.
+
+## 12. Test harness (box)
+* `test/launch-papyrus-test.sh` starts the installed Papyrus under Xvfb with a **throwaway**
+  configuration (`/tmp/pmcfg`). Our jar is added through `osgi.bundles` plus
+  `simpleconfigurator.exclusiveInstallation=false`. The dropins reconciler was unreliable here,
+  and p2 rewrites `bundles.info`.
+* `-Dpapyrus.mcp.testOpen=<model.di>`: a startup hook (in `Startup`) links the folder as project
+  `mcp-test` and opens the .di with `IDE.openEditor`. `--launcher.openFile` did not work.
+* `test/smoke.py` acts as two clients (grok-build and grok-bot) and covers every read tool, the
+  changelog, the cursors and stale edits. Its output is saved in `test/smoke-output.txt`.

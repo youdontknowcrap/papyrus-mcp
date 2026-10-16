@@ -33,7 +33,8 @@ public class McpHttpServer {
     private final ToolRegistry tools;
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private HttpServer http;
-    private volatile String sessionId;
+    /** Sessions by Mcp-Session-Id. Many clients (Grok Build, Grok Bot, ...) may be connected at once. */
+    private final java.util.Map<String, Session> sessions = new java.util.concurrent.ConcurrentHashMap<>();
 
     public McpHttpServer(int port, String token, ToolRegistry tools) {
         this.port = port;
@@ -61,7 +62,11 @@ public class McpHttpServer {
             if (!tokenOk(ex)) { send(ex, 401, "{\"error\":\"unauthorized\"}"); return; }
             switch (ex.getRequestMethod()) {
                 case "POST" -> post(ex);
-                case "DELETE" -> { sessionId = null; send(ex, 200, ""); }
+                case "DELETE" -> {
+                    String sid = ex.getRequestHeaders().getFirst("Mcp-Session-Id");
+                    if (sid != null) sessions.remove(sid);
+                    send(ex, 200, "");
+                }
                 default -> send(ex, 405, "");
             }
         } catch (Exception e) {
@@ -99,8 +104,12 @@ public class McpHttpServer {
         try {
             switch (method) {
                 case "initialize": {
-                    sessionId = UUID.randomUUID().toString();
-                    ex.getResponseHeaders().add("Mcp-Session-Id", sessionId);
+                    String sid = UUID.randomUUID().toString();
+                    JsonObject ci = params.has("clientInfo") ? params.getAsJsonObject("clientInfo") : new JsonObject();
+                    sessions.put(sid, new Session(sid,
+                            ci.has("name") ? ci.get("name").getAsString() : null,
+                            ci.has("version") ? ci.get("version").getAsString() : null));
+                    ex.getResponseHeaders().add("Mcp-Session-Id", sid);
                     JsonObject res = new JsonObject();
                     res.addProperty("protocolVersion", PROTOCOL_VERSION);
                     JsonObject caps = new JsonObject();
@@ -124,7 +133,12 @@ public class McpHttpServer {
                 case "tools/call": {
                     String name = params.get("name").getAsString();
                     JsonObject args = params.has("arguments") ? params.getAsJsonObject("arguments") : new JsonObject();
-                    return JsonRpc.result(id, tools.call(name, args));
+                    // Unknown/missing session id -> anonymous identity (lenient for curl testing;
+                    // strict clients always send the header after initialize).
+                    String sid = ex.getRequestHeaders().getFirst("Mcp-Session-Id");
+                    Session.setCurrent(sid == null ? null : sessions.get(sid));
+                    try { return JsonRpc.result(id, tools.call(name, args)); }
+                    finally { Session.setCurrent(null); }
                 }
                 default: return JsonRpc.error(id, -32601, "method not found: " + method);
             }

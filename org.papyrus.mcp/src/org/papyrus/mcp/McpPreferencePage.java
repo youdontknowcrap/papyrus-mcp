@@ -17,6 +17,7 @@ public class McpPreferencePage extends FieldEditorPreferencePage implements IWor
         port.setValidRange(1024, 65535);
         addField(port);
         addField(new StringFieldEditor(Prefs.TOKEN, "Bearer token (empty = none)", getFieldEditorParent()));
+        addField(new BooleanFieldEditor(Prefs.CHANGELOG_SIDECAR, "Save MCP changelog next to the model (.mcp-changelog.json)", getFieldEditorParent()));
         addField(new BooleanFieldEditor(Prefs.READ_ONLY, "Read-only (refuse edit tools)", getFieldEditorParent()));
     }
 }
