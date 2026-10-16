@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Profile xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_Gj_goMmVEfG2q8a8ZxO8WA" name="McpTest" URI="http://papyrus-mcp/test/McpTest" metaclassReference="_Gj_gscmVEfG2q8a8ZxO8WA">
+  <eAnnotations xmi:id="_Gj_gocmVEfG2q8a8ZxO8WA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+    <contents xmi:type="ecore:EPackage" xmi:id="_Gj_gosmVEfG2q8a8ZxO8WA" name="McpTest" nsURI="http://papyrus-mcp/test/McpTest" nsPrefix="McpTest">
+      <eClassifiers xmi:type="ecore:EEnum" xmi:id="_Gj_go8mVEfG2q8a8ZxO8WA" name="Persistence">
+        <eAnnotations xmi:id="_Gj_gpMmVEfG2q8a8ZxO8WA" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_Gj_gs8mVEfG2q8a8ZxO8WA"/>
+        <eLiterals xmi:id="_Gj_gpcmVEfG2q8a8ZxO8WA" name="Persistent"/>
+        <eLiterals xmi:id="_Gj_gpsmVEfG2q8a8ZxO8WA" name="Transient" value="1"/>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_Gj_gp8mVEfG2q8a8ZxO8WA" name="Entity">
+        <eAnnotations xmi:id="_Gj_gqMmVEfG2q8a8ZxO8WA" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_Gj_gtsmVEfG2q8a8ZxO8WA"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_Gj_gqcmVEfG2q8a8ZxO8WA" name="base_Class" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_Gj_gq8mVEfG2q8a8ZxO8WA" name="table" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//String"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_Gj_grcmVEfG2q8a8ZxO8WA" name="version" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/uml2/5.0.0/Types#//Integer"/>
+        </eStructuralFeatures>
+        <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="_Gj_gr8mVEfG2q8a8ZxO8WA" name="persistence" ordered="false" lowerBound="1" eType="_Gj_go8mVEfG2q8a8ZxO8WA"/>
+      </eClassifiers>
+    </contents>
+  </eAnnotations>
+  <elementImport xmi:id="_Gj_gscmVEfG2q8a8ZxO8WA">
+    <importedElement xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+  </elementImport>
+  <packageImport xmi:id="_Gj_gssmVEfG2q8a8ZxO8WA">
+    <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+  </packageImport>
+  <packagedElement xmi:type="uml:Enumeration" xmi:id="_Gj_gs8mVEfG2q8a8ZxO8WA" name="Persistence">
+    <ownedLiteral xmi:id="_Gj_gtMmVEfG2q8a8ZxO8WA" name="Persistent"/>
+    <ownedLiteral xmi:id="_Gj_gtcmVEfG2q8a8ZxO8WA" name="Transient"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Stereotype" xmi:id="_Gj_gtsmVEfG2q8a8ZxO8WA" name="Entity">
+    <ownedAttribute xmi:id="_Gj_gt8mVEfG2q8a8ZxO8WA" name="base_Class" association="_Gj_gu8mVEfG2q8a8ZxO8WA">
+      <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_Gj_guMmVEfG2q8a8ZxO8WA" name="table">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_Gj_gucmVEfG2q8a8ZxO8WA" name="version">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:id="_Gj_gusmVEfG2q8a8ZxO8WA" name="persistence" type="_Gj_gs8mVEfG2q8a8ZxO8WA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Extension" xmi:id="_Gj_gu8mVEfG2q8a8ZxO8WA" name="Class_Entity" memberEnd="_Gj_gvMmVEfG2q8a8ZxO8WA _Gj_gt8mVEfG2q8a8ZxO8WA">
+    <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_Gj_gvMmVEfG2q8a8ZxO8WA" name="extension_Entity" type="_Gj_gtsmVEfG2q8a8ZxO8WA" aggregation="composite" association="_Gj_gu8mVEfG2q8a8ZxO8WA"/>
+  </packagedElement>
+</uml:Profile>

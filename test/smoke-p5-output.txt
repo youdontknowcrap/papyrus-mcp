@@ -1,0 +1,49 @@
+
+### create_diagram class
+{"id": "_zJnWIMmVEfGKCc1HMNB-cg", "name": "MCP - Core domain", "type": "PapyrusUMLClassDiagram", "kind": "org.eclipse.papyrus.uml.diagram.class", "seq": 10, "undoLabel": "MCP: create class diagram 'MCP - Core domain'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 10, "opened": true}
+
+### add_to_diagram 6 classes + relationships
+{"nodes": [["Production", "Class_Shape"], ["Scene", "Class_Shape"], ["Beat", "Class_Shape"], ["Shot", "Class_Shape"], ["Timeline", "Class_Shape"], ["Render", "Class_Shape"]], "edges": [["Production has scenes", "Association", "Association_Edge"], ["Scene has beats", "Association", "Association_Edge"], ["Scene has timelines", "Association", "Association_Edge"], ["Render is of a scene", "Association", "Association_Edge"], ["Render conforms a timeline", "Association", "Association_Edge"]], "skipped": []}
+
+### add again (already shown)
+["_mh_cls_0433: already shown"]
+exported 1-before-layout.png: 25685 bytes, mimeType image/png
+
+### layout graphviz LR
+{"diagram": "MCP - Core domain", "nodes": 7, "algorithm": "graphviz", "seq": 13, "undoLabel": "MCP: layout diagram 'MCP - Core domain'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 13}
+exported 2-after-layout.png: 32993 bytes, mimeType image/png
+
+### remove_from_diagram Render
+{"removedViews": 1, "seq": 14, "undoLabel": "MCP: remove 1 view(s) from diagram", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 14}
+
+### undo remove
+{"undone": "MCP: remove 1 view(s) from diagram", "seq": 15, "modelVersion": 15}
+
+### list_diagrams (new one)
+[{"id": "_zJnWIMmVEfGKCc1HMNB-cg", "name": "MCP - Core domain", "framework": "gmf", "type": "PapyrusUMLClassDiagram", "kind": "org.eclipse.papyrus.uml.diagram.class", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "context": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "nodeCount": 7, "edgeCount": 6}]
+
+### create_diagram usecase
+{"id": "_zsxGgMmVEfGKCc1HMNB-cg", "name": "MCP - Use cases", "type": "UseCase", "kind": "org.eclipse.papyrus.uml.diagram.useCase", "seq": 16, "undoLabel": "MCP: create usecase diagram 'MCP - Use cases'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 16}
+
+### usecase add
+{"nodes": 9, "edges": 13, "skipped": []}
+
+### layout usecase grid
+{"diagram": "MCP - Use cases", "nodes": 9, "algorithm": "grid", "seq": 18, "undoLabel": "MCP: layout diagram 'MCP - Use cases'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 18}
+exported 3-usecase-grid.png: 47383 bytes, mimeType image/png
+
+### actor on class diagram (should be skipped or shown)
+[]
+
+### batch model+diagram
+{"seq": 21, "undoLabel": "MCP: Lamp model + diagram", "edges": [{"id": "_z6YEsMmVEfGKCc1HMNB-cg", "metaclass": "Association", "viewType": "Association_Edge"}]}
+exported 4-batch-lamp.png: 4903 bytes, mimeType image/png
+
+### undo batch
+{"undone": "MCP: Lamp model + diagram", "seq": 22, "modelVersion": 22}
+
+### Lamp diagram gone?
+[]
+
+### save
+{"saved": true, "dirty": false, "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml"}

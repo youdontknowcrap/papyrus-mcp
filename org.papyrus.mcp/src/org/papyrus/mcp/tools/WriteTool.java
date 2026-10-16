@@ -12,8 +12,23 @@ import org.papyrus.mcp.util.*;
 public abstract class WriteTool implements Tool {
     /** Runs inside the McpCommand transaction. Must only touch the model; no dialogs. */
     public abstract JsonObject apply(WriteSupport.Ctx ctx, JsonObject args) throws Exception;
-    /** Short human label: becomes "MCP: <label>" in Papyrus' Edit > Undo menu. */
-    public abstract String label(JsonObject args);
+    /**
+     * Short human label: becomes "MCP: <label>" in Papyrus' Edit > Undo menu. Computed on the UI
+     * thread BEFORE executing (Papyrus' operation history captures the label at execute time), so
+     * use n(m, args, key) to show element names instead of ids.
+     */
+    public abstract String label(ModelLocator.Active m, JsonObject args);
+
+    /** Name (or qualified-name tail) of the element referenced by args[key]; falls back to the raw value. */
+    protected static String n(ModelLocator.Active m, JsonObject a, String key) {
+        String v = str(a, key);
+        if (v == null) return "?";
+        try {
+            var e = ElementJson.resolve(m, v);
+            if (e instanceof org.eclipse.uml2.uml.NamedElement ne && ne.getName() != null) return ne.getName();
+            return e.eClass().getName();
+        } catch (Exception ex) { return v; }
+    }
     /** Tool-specific schema; common args (model, expected_version, expected_etags) are added for you. */
     protected abstract JsonObject schema();
 
@@ -31,7 +46,7 @@ public abstract class WriteTool implements Tool {
         Session s = Session.current();
         return UiSync.call(() -> {
             ModelLocator.Active m = ModelLocator.require(ReadTool.str(args, "model"));
-            return WriteSupport.run(s, m, args, name(), label(args), ctx -> apply(ctx, args));
+            return WriteSupport.run(s, m, args, name(), label(m, args), ctx -> apply(ctx, args));
         });
     }
 

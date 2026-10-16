@@ -132,17 +132,17 @@ What we already know from `/workspace/mudhut/papyrus-out` (`gen_notation.py`,
 | 13 | `add_enumeration_literal` ✅ | `enumeration`, `name` | write |
 | 14 | `update_element` ✅ | `id`, `set{feature: value}` (name, visibility, isAbstract, type, lower/upper, body...) | write |
 | 15 | `set_comment` ✅ | `id`, `body`, `replace?` (annotates the element with an owned Comment) | write |
-| 16 | `apply_stereotype` / `unapply_stereotype` | `id`, `stereotype` (qn), `values?{tag:value}` | write |
-| 17 | `apply_profile` | `package`, `profile` (URI or registered name) | write |
+| 16 | `apply_stereotype` / `unapply_stereotype` ✅ | `id`, `stereotype` (qn), `values?{tag:value}` | write |
+| 17 | `apply_profile` ✅ | `package`, `profile` (URI or registered name) | write |
 | 18 | `move_element` ✅ | `id`, `newContainer` | write |
 | 19 | `delete_elements` ✅ | `ids[]`, `dryRun?` (dry run reports what would be deleted, including views) | write |
 | 20 | `batch` ✅ | `operations[]` (any write tools) → **one** undo step, ids from earlier ops usable as `$1`,`$2` | write |
-| 21 | `create_diagram` | `kind` (class, usecase, activity, statemachine, component, package), `owner`, `name`, `open?=true` | write |
-| 22 | `add_to_diagram` | `diagram`, `elements[]` (`{id, x?,y?,w?,h?}`), `withRelationships?=true` | write |
-| 23 | `remove_from_diagram` | `diagram`, `elements[]` (view only; the model is untouched) | write |
-| 24 | `layout_diagram` | `diagram`, `algorithm?=gmf\|graphviz`, `rankdir?=LR` | write |
-| 25 | `export_diagram_image` | `diagram`, `format?=png\|svg` → base64 image content (so the bot can look at its work) | read |
-| 26 | `validate` | `id?` (default root), `severity?` → list of `{severity, message, elementId, source}` | read* |
+| 21 | `create_diagram` ✅ | `kind` (class, usecase, activity, statemachine, component, package), `owner`, `name`, `open?=true` | write |
+| 22 | `add_to_diagram` ✅ | `diagram`, `elements[]` (`{id, x?,y?,w?,h?}`), `withRelationships?=true` | write |
+| 23 | `remove_from_diagram` ✅ | `diagram`, `elements[]` (view only; the model is untouched) | write |
+| 24 | `layout_diagram` ✅ | `diagram`, `algorithm?=gmf\|graphviz`, `rankdir?=LR` | write |
+| 25 | `export_diagram_image` ✅ | `diagram`, `format?=png\|svg` → base64 image content (so the bot can look at its work) | read |
+| 26 | `validate` ✅ | `id?` (default root), `severity?` → list of `{severity, message, elementId, source}` | read* |
 | 27 | `undo` / `redo` ✅ | `force?=false` | write |
 | 28 | `save` ✅ | `model?` → `editor.doSave()` | write |
 | 29 | `get_selection` ✅ | – → the elements selected in the Model Explorer or diagram, so the user can point at things | read |
@@ -198,9 +198,9 @@ See §10.
 3. **Phase 3 (write) (done, tested live 2026-10-16; see §13):** the command helper (`McpCommands.run(label, ...)`), `create_element`,
    `create_relationship`, `add_property/operation/literal`, `update_element`, `set_comment`,
    `delete_elements`, `move_element`, `undo/redo`, `save`, `batch`.
-4. **Phase 4 (stereotypes and validation):** `apply_profile`, `apply/unapply_stereotype` with
+4. **Phase 4 (stereotypes and validation) (done, see §14):** `apply_profile`, `apply/unapply_stereotype` with
    tagged values, `validate`.
-5. **Phase 5 (diagrams):** `create_diagram`, `add_to_diagram`, `remove_from_diagram`,
+5. **Phase 5 (diagrams) (done for class, usecase and component diagrams; see §15):** `create_diagram`, `add_to_diagram`, `remove_from_diagram`,
    `layout_diagram` (gmf, then graphviz), `export_diagram_image`.
 6. **Phase 6:** Tycho build, update site, SSE progress, confirm-writes option. Sirius diagram
    tools (v2).
@@ -357,3 +357,90 @@ exactly what the remote bot did.
 * **Laptop:** `test/laptop-launch.sh` uses a throwaway `/tmp/papyrus-mcp-cfg` and loads the jar
   through `osgi.bundles`, so the install folder is never written. `test/laptop-smoke.sh` runs
   curl initialize, ping and list_packages.
+
+## 14. Phase 4 as built: profiles, stereotypes, validation
+* **`apply_profile(profile, package?, unapply?)`** resolves the profile in this order:
+  1. a profile already loaded in the ModelSet, by name, qualified name or URI
+  2. an alias (`Standard`/`StandardProfile`, `Ecore`)
+  3. a URI or absolute path (pathmap:, platform:, file:)
+
+  Only *defined* profiles can be applied. It uses UML2 `applyProfile` / `unapplyProfile` inside the
+  McpCommand, so it is one undo step.
+* **`apply_stereotype(id, stereotype, values?)`** applies the stereotype, or only sets values if
+  it is already applied.
+  * Tag values are converted by the tag's type: primitives (Integer, Boolean, Real, String),
+    enums by literal name (UML2 maps them to the profile's EEnumLiteral), element refs by id or
+    qualified name, and stereotype-typed refs through the target's stereotype application.
+  * An unknown tag or literal is an error and nothing changes.
+* **`unapply_stereotype(id, stereotype)`** removes a stereotype.
+* **`validate(id?, severity?, limit?)`** uses Papyrus' `UMLDiagnostician`, the same engine as
+  "Validate Model": UML2 constraints plus the EMF Validation framework. It falls back to the EMF
+  `Diagnostician`.
+  * It returns counts and a flat list of `{severity, message, source, code, element}`.
+  * v1 does not create Problems-view markers.
+* **Undo labels now use element names**, for example `MCP: move McpColor to McpSub`,
+  `MCP: apply «Entity» to Scene`, `MCP: delete McpProbe2`. `WriteTool.label(m, args)` runs on
+  the UI thread before execution, because the Papyrus operation history captures the label at
+  that moment.
+* **Test fixture:** `test/fixtures/McpTest.profile.uml`, built by `test/fixtures/gen/MakeProfile.java`
+  with standalone UML2. It has stereotype `Entity`, which extends Class, with tags
+  table:String, version:Integer and persistence:Persistence{Persistent, Transient}.
+* **Finding on the test model:** a full validation reports 16 errors and 97 warnings. The errors
+  say the activity nodes of "Onboarding" are not listed in `Activity.node`, which points to a
+  structural flaw in the generated .uml from the earlier mudhut work. The warnings are mostly
+  duplicate association names like "User plays" and "House helps". This is worth fixing in the
+  real model.
+
+## 15. Phase 5 as built: GMF diagrams
+* **Kinds supported:**
+
+  | Kind | Diagram type | Kind id |
+  |---|---|---|
+  | `class` | PapyrusUMLClassDiagram | org.eclipse.papyrus.uml.diagram.class |
+  | `usecase` | UseCase | org.eclipse.papyrus.uml.diagram.useCase |
+  | `component` | PapyrusUMLComponentDiagram | org.eclipse.papyrus.uml.diagram.component.root.package |
+
+  Activity, state machine and sequence diagrams need frame nodes (the Activity or StateMachine
+  shape with regions) and are refused with a clear message for now. Planned as phase 5b.
+* **Pure notation-model approach, inside the McpCommand,** so diagrams are undoable and batchable
+  together with model edits:
+  * `ViewService.createDiagram`, then add `PapyrusDiagramStyle{diagramKindId, owner}` and the
+    `diagram_compatibility_version=1.4.0` style. This is the knowledge carried over from
+    papyrus-out. Then add the diagram to the model's .notation resource.
+  * After the command, `open=true` opens the page through `IPageManager`. That is editor state
+    and is not undoable.
+* **Nodes:** `ViewService.createNode(diagram, element, hint, prefHint)`.
+  * The hint comes from the diagram plugin's `UMLVisualIDRegistry.getNodeVisualID` (loaded
+    reflectively). If that gives nothing, we use `<Metaclass>_Shape`.
+  * Papyrus' own view providers build the full label and compartment structure.
+* **Edges:** Papyrus' generated providers only provide an edge when the semantic adapter also
+  adapts to the `IElementType` `org.eclipse.papyrus.umldi.<Metaclass>_Edge`. `Diagrams.createEdge`
+  passes such an adapter, then connects source and target.
+  * The ends follow Papyrus conventions: association = memberEnds[0].type → memberEnds[1].type,
+    generalization specific → general, dependency client → supplier, include/extend,
+    interface realization, package import.
+* **`add_to_diagram`** auto-places nodes on a grid below existing content unless x and y are
+  given. With `withRelationships`, it draws every relationship whose two ends are both shown.
+  Elements already shown are skipped and reported.
+* **`remove_from_diagram`** uses `ViewUtil.destroy`, which removes attached edges. The model is
+  untouched.
+* **`layout_diagram`:**
+  * `graphviz` (default) runs `dot -Tplain` on the diagram graph, with generalizations pointing
+    up. Node sizes are estimated from features; association ends are not counted as rows.
+  * `grid` is the fallback when `dot` is missing or fails.
+  * Edges are straightened.
+  * **Deviation from §3:** GMF "Arrange All" needs live edit parts (an open editor), so it is not
+    used in v1.
+* **`export_diagram_image(diagram, format=png|jpg|svg)`** renders offscreen with GMF
+  `CopyToImageUtil`. The diagram does not have to be open. PNG and JPG come back as an MCP
+  `image` content item, and SVG as text. The temp file is deleted afterwards, there is no path
+  argument, and output is capped at 8 MB.
+* **Tests:** `test/smoke_p5.py`:
+  * a class diagram with 6 classes and 5 associations
+  * a use case diagram with 9 nodes and 13 edges
+  * graphviz and grid layout
+  * remove, then undo
+  * one batch that builds model and diagram together and is undone in a single step
+  * save, then reload with `RESET=0`, after which the diagrams are still there and still render
+
+  PNGs are in `test/p5-images/`.

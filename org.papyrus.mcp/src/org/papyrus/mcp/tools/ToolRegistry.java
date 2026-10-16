@@ -38,6 +38,17 @@ public class ToolRegistry {
         r.add(new UndoRedoTool(true));
         r.add(new UndoRedoTool(false));
         r.add(new SaveTool());
+        // Phase 4: profiles, stereotypes, validation
+        r.add(new ApplyProfileTool());
+        r.add(new ApplyStereotypeTool());
+        r.add(new UnapplyStereotypeTool());
+        r.add(new ValidateTool());
+        // Phase 5: GMF diagrams
+        r.add(new CreateDiagramTool());
+        r.add(new AddToDiagramTool());
+        r.add(new RemoveFromDiagramTool());
+        r.add(new LayoutDiagramTool());
+        r.add(new ExportDiagramImageTool());
         if (Boolean.getBoolean("papyrus.mcp.debugTools")) { // test-only, see DebugTools.java
             r.add(new DebugBlockUiTool());
             r.add(new DebugOpenDialogTool());
@@ -75,10 +86,17 @@ public class ToolRegistry {
             JsonObject data = t.execute(args);
             JsonObject res = new JsonObject();
             JsonArray content = new JsonArray();
+            // "_image" {data, mimeType} becomes an MCP image content item (kept out of structuredContent).
+            JsonElement img = data.remove("_image");
             JsonObject text = new JsonObject();
             text.addProperty("type", "text");
             text.addProperty("text", data.toString());
             content.add(text);
+            if (img != null && img.isJsonObject()) {
+                JsonObject ic = img.getAsJsonObject().deepCopy();
+                ic.addProperty("type", "image");
+                content.add(ic);
+            }
             res.add("content", content);
             res.add("structuredContent", data);
             res.addProperty("isError", false);

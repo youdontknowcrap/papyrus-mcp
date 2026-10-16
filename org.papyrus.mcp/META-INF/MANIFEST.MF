@@ -30,5 +30,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.emf.type.core,
  org.eclipse.gmf.runtime.common.core,
  org.eclipse.core.commands,
+ org.eclipse.papyrus.uml.service.validation,
+ org.eclipse.papyrus.infra.services.validation,
+ org.eclipse.gmf.runtime.diagram.core,
+ org.eclipse.gmf.runtime.diagram.ui,
+ org.eclipse.gmf.runtime.diagram.ui.render,
+ org.eclipse.papyrus.infra.core.sashwindows.di,
  com.google.gson
 Import-Package: com.sun.net.httpserver

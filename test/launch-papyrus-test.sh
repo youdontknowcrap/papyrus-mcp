@@ -22,5 +22,5 @@ echo "org.eclipse.equinox.simpleconfigurator.exclusiveInstallation=false" >> /tm
 cd "$PAP"
 nohup xvfb-run -a -s "-screen 0 1600x1000x24" ./papyrus-desktop -configuration /tmp/pmcfg -data /tmp/pmws -nosplash \
   -vmargs -Dpapyrus.mcp.port=7342 -Dpapyrus.mcp.testOpen="$HERE/testmodel/MudHut Opener Am..di" \
-  -Dpapyrus.mcp.changelogSidecar=true -Dpapyrus.mcp.debugTools=true -Dpapyrus.mcp.uiTimeoutMs=3000 > /tmp/pm.log 2>&1 &
+  -Dpapyrus.mcp.changelogSidecar=true -Dpapyrus.mcp.debugTools=true -Dpapyrus.mcp.uiTimeoutMs=${UITIMEOUT:-3000} > /tmp/pm.log 2>&1 &
 echo "launched; MCP at http://127.0.0.1:7342/mcp (log /tmp/pm.log, /tmp/pmws/.metadata/.log)"

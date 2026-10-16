@@ -1,0 +1,48 @@
+
+### apply_profile Standard (alias)
+{"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am", "profile": "StandardProfile", "stereotypes": ["StandardProfile::Auxiliary", "StandardProfile::Call", "StandardProfile::Create", "StandardProfile::Derive", "StandardProfile::Destroy", "StandardProfile::Document", "StandardProfile::Entity", "StandardProfile::Executable", "StandardProfile::File", "StandardProfile::Focus", "StandardProfile::Framework", "StandardProfile::Implement", "StandardProfile::ImplementationClass", "StandardProfile::Instantiate", "StandardProfile::Library", "StandardProfile::Metaclass", "StandardProfile::ModelLibrary", "StandardProfile::Process", "Standa
+
+### apply_profile McpTest (file path)
+{"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am", "profile": "McpTest", "stereotypes": ["McpTest::Entity"], "seq": 2, "undoLabel": "MCP: apply profile McpTest to MudHut Opener Am", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 2}
+
+### get_stereotypes (model)
+[["StandardProfile", 33], ["McpTest", 1]]
+
+### applicable on Scene
+["StandardProfile::Auxiliary", "StandardProfile::Focus", "StandardProfile::ImplementationClass", "StandardProfile::Metaclass", "StandardProfile::Realization", "StandardProfile::Specification", "StandardProfile::Type", "StandardProfile::Utility", "McpTest::Entity"]
+
+### apply «Entity» with tags
+{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "bfe52be68db8", "stereotypes": [{"stereotype": "McpTest::Entity", "profile": "McpTest", "taggedValues": {"table": "scenes", "version": 3, "persistence": {"id": "_Gj_gtcmVEfG2q8a8ZxO8WA", "metaclass": "EnumerationLiteral", "name": "Transient", "qualifiedName": "McpTest::Persistence::Transient"}}}], "seq": 3, "undoLabel": "MCP: apply «Entity» to Scene", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 3}
+
+### apply «Auxiliary» (Standard)
+{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "3c0d3e713c8e", "stereotypes": [{"stereotype": "McpTest::Entity", "profile": "McpTest", "taggedValues": {"table": "scenes", "version": 3, "persistence": {"id": "_Gj_gtcmVEfG2q8a8ZxO8WA", "metaclass": "EnumerationLiteral", "name": "Transient", "qualifiedName": "McpTest::Persistence::Transient"}}}, {"stereotype": "StandardProfile::Auxiliary", "profile": "StandardProfile", "taggedValues": {}}], "seq": 4, "undoLabel": "MCP: apply «StandardProfile::Auxiliary» to Scene", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 4}
+
+### update tags only
+{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene", "etag": "3c0d3e713c8e", "stereotypes": [{"stereotype": "McpTest::Entity", "profile": "McpTest", "taggedValues": {"table": "scenes", "version": 4, "persistence": {"id": "_Gj_gtcmVEfG2q8a8ZxO8WA", "metaclass": "EnumerationLiteral", "name": "Transient", "qualifiedName": "McpTest::Persistence::Transient"}}}, {"stereotype": "StandardProfile::Auxiliary", "profile": "StandardProfile", "taggedValues": {}}], "seq": 5, "undoLabel": "MCP: apply «Entity» to Scene", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 5}
+
+### bad tag
+"ERROR: IllegalArgumentException: stereotype Entity has no tag 'nope'"
+
+### bad enum literal
+"ERROR: IllegalArgumentException: no literal 'Frozen' in Persistence"
+
+### get_element stereotypes
+[{"stereotype": "McpTest::Entity", "profile": "McpTest", "taggedValues": {"table": "scenes", "version": 4, "persistence": {"id": "_Gj_gtcmVEfG2q8a8ZxO8WA", "metaclass": "EnumerationLiteral", "name": "Transient", "qualifiedName": "McpTest::Persistence::Transient"}}}, {"stereotype": "StandardProfile::Auxiliary", "profile": "StandardProfile", "taggedValues": {}}]
+
+### unapply «Auxiliary»
+[{"stereotype": "McpTest::Entity", "profile": "McpTest", "taggedValues": {"table": "scenes", "version": 4, "persistence": {"id": "_Gj_gtcmVEfG2q8a8ZxO8WA", "metaclass": "EnumerationLiteral", "name": "Transient", "qualifiedName": "McpTest::Persistence::Transient"}}}]
+
+### undo -> Auxiliary back
+{"undone": "MCP: unapply «Auxiliary» from Scene", "seq": 7, "modelVersion": 7}
+
+### find_elements stereotype=Entity
+{"total": 1, "elements": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 7}
+
+### validate (warnings+)
+{"engine": "papyrus-uml", "root": {"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am"}, "errors": 16, "warnings": 97, "infos": 0, "problems": [{"severity": "warning", "message": "Named element 'MudHut Opener Am::System User Goals::House helps' is not distinguishable from all other members of namespace 'MudHut Opener Am::System User Goals'.", "source": "org.eclipse.uml2.uml", "code": 12, "element": {"id": "_mh_asc_0256", "metaclass": "Association", "name": "House helps", "qualifiedName": "MudHut Opener Am::System User Goals::House helps"}}, {"severity": "warning", "message": "Named element 'MudHut Opener Am::System User Goals::House helps' is not distinguishable from all other members of namespace 'MudHut Opener Am::System User Goals'.", "source": "org.eclipse.uml2.uml", "code": 12, "element": {"id": "_mh_asc_0263", "metaclass": "Association", "name": "House helps", "qualifiedName": "MudHut Opener Am::System User Goals::House helps"}}, {"severity": "warning", "message": "Named element 'MudHut Opener Am::System User Goals::House helps' is not distinguishable from all other members of namespace 'MudHut Opener Am::System User Goals'.", "source": "org.eclipse.uml2.uml", "code": 12, "element": {"id": "_mh_asc_0270", "metaclass": "Association", "name": "House helps", "qualifiedName": "MudHut Opener Am::System User Goals::House helps"}}, {"severity": "warning", "message": "Named element 'MudHut Opener Am::System User
+
+### validate Scene after lower>upper
+{"engine": "papyrus-uml", "root": {"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}, "errors": 0, "warnings": 1, "infos": 0, "problems": [{"severity": "warning", "message": "The upper bound of multiplicity element 'MudHut Opener Am::Domain::Scene::broken' is not greater than or equal to its lower bound.", "source": "org.eclipse.uml2.uml", "code": 57, "element": {"id": "_zHoZIMmVEfGKCc1HMNB-cg", "metaclass": "Property", "name": "broken", "qualifiedName": "MudHut Opener Am::Domain::Scene::broken"}}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 9}
+
+### undo label uses names
+["MCP: apply profile McpTest to MudHut Opener Am", "MCP: apply «Entity» to Scene", "MCP: apply «StandardProfile::Auxiliary» to Scene", "MCP: apply «Entity» to Scene", "MCP: unapply «Auxiliary» from Scene", "MCP: unapply «Auxiliary» from Scene", "MCP: add property Scene.broken", "MCP: update broken [lower, upper]"]

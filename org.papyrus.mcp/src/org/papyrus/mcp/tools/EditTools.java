@@ -9,6 +9,7 @@ import org.eclipse.uml2.uml.*;
 import org.eclipse.uml2.uml.Package;
 import org.eclipse.uml2.uml.Enumeration;
 import org.papyrus.mcp.util.*;
+import org.papyrus.mcp.util.ModelLocator;
 import org.papyrus.mcp.util.WriteSupport.Ctx;
 
 /*
@@ -26,7 +27,7 @@ final class EditUtil {
     }
     static JsonObject created(Ctx ctx, EObject e, String what) {
         ctx.touched(e);
-        ctx.summaries.add(what);
+        if (what != null) ctx.summaries.add(what);
         JsonObject o = ElementJson.ref(e);
         o.addProperty("etag", ElementJson.etag(e));
         return o;
@@ -50,7 +51,7 @@ class CreateElementTool extends WriteTool {
             {"properties", "object", "Optional features to set, as in update_element (e.g. {\"isAbstract\":true,\"visibility\":\"private\"})."}},
             "metaclass");
     }
-    public String label(JsonObject a) { return "create " + str(a, "metaclass") + " " + Objects.toString(str(a, "name"), ""); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "create " + str(a, "metaclass") + " " + Objects.toString(str(a, "name"), ""); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Element c = ElementJson.resolve(ctx.m, str(a, "container"));
         EClass ec = EditUtil.metaclass(need(a, "metaclass"));
@@ -75,10 +76,10 @@ class CreateRelationshipTool extends WriteTool {
             {"target", "string", "Target element id/qn (supplier, general, addition, ...)."},
             {"name", "string", "Optional name."},
             {"ends", "object", "Association only: {\"source\":{name,navigable,aggregation(none|shared|composite),multiplicity}, \"target\":{...}}. "
-                             + "Defaults: target end navigable 1, source end not navigable 1. Aggregation on an end = that end's diamond side."}},
+                             + "Defaults: target end navigable 1, source end not navigable 1. For composition put aggregation=composite on the PART end (the end typed by the part); the diamond is drawn at the opposite (whole) end, as in UML."}},
             "metaclass", "source", "target");
     }
-    public String label(JsonObject a) { return "create " + str(a, "metaclass"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "create " + str(a, "metaclass") + " " + n(m, a, "source") + " -> " + n(m, a, "target"); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Element s = ElementJson.resolve(ctx.m, need(a, "source")), t = ElementJson.resolve(ctx.m, need(a, "target"));
         String mc = need(a, "metaclass"), name = str(a, "name");
@@ -149,7 +150,7 @@ class AddPropertyTool extends WriteTool {
             {"default", "string", "Optional default value (text)."}},
             "classifier", "name");
     }
-    public String label(JsonObject a) { return "add property " + str(a, "name"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "add property " + n(m, a, "classifier") + "." + str(a, "name"); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Classifier c = (Classifier) ElementJson.resolve(ctx.m, need(a, "classifier"));
         EStructuralFeature f = c.eClass().getEStructuralFeature("ownedAttribute");
@@ -179,7 +180,7 @@ class AddOperationTool extends WriteTool {
         s.getAsJsonObject("properties").getAsJsonObject("params").add("items", JsonParser.parseString("{\"type\":\"object\"}"));
         return s;
     }
-    public String label(JsonObject a) { return "add operation " + str(a, "name"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "add operation " + n(m, a, "classifier") + "." + str(a, "name") + "()"; }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Classifier c = (Classifier) ElementJson.resolve(ctx.m, need(a, "classifier"));
         EStructuralFeature f = c.eClass().getEStructuralFeature("ownedOperation");
@@ -211,7 +212,7 @@ class AddEnumerationLiteralTool extends WriteTool {
     protected JsonObject schema() {
         return schema(new String[][]{{"enumeration", "string", "Enumeration id/qn."}, {"name", "string", "Literal name."}}, "enumeration", "name");
     }
-    public String label(JsonObject a) { return "add literal " + str(a, "name"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "add literal " + n(m, a, "enumeration") + "::" + str(a, "name"); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Enumeration en = (Enumeration) ElementJson.resolve(ctx.m, need(a, "enumeration"));
         EnumerationLiteral l = en.createOwnedLiteral(need(a, "name"));
@@ -229,7 +230,7 @@ class UpdateElementTool extends WriteTool {
     protected JsonObject schema() {
         return schema(new String[][]{{"id", "string", "Element id/qn."}, {"set", "object", "{feature: value}; null clears."}}, "id", "set");
     }
-    public String label(JsonObject a) { return "update " + str(a, "id"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "update " + n(m, a, "id") + " " + a.getAsJsonObject("set").keySet(); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Element e = ElementJson.resolve(ctx.m, need(a, "id"));
         String before = EditUtil.nm(e);
@@ -245,7 +246,7 @@ class SetCommentTool extends WriteTool {
         return schema(new String[][]{{"id", "string", "Element id/qn."}, {"body", "string", "Comment text."},
             {"replace", "boolean", "true (default): replace the first owned comment's text; false: add another comment."}}, "id", "body");
     }
-    public String label(JsonObject a) { return "comment on " + str(a, "id"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "comment on " + n(m, a, "id"); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Element e = ElementJson.resolve(ctx.m, need(a, "id"));
         boolean replace = !a.has("replace") || a.get("replace").getAsBoolean();
@@ -263,7 +264,7 @@ class MoveElementTool extends WriteTool {
     protected JsonObject schema() {
         return schema(new String[][]{{"id", "string", "Element id/qn."}, {"newContainer", "string", "New owner id/qn."}}, "id", "newContainer");
     }
-    public String label(JsonObject a) { return "move " + str(a, "id"); }
+    public String label(ModelLocator.Active m, JsonObject a) { return "move " + n(m, a, "id") + " to " + n(m, a, "newContainer"); }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
         Element e = ElementJson.resolve(ctx.m, need(a, "id")), t = ElementJson.resolve(ctx.m, need(a, "newContainer"));
         EditService.move(ctx.m, e, t);
@@ -285,7 +286,11 @@ class DeleteElementsTool extends WriteTool {
         s.getAsJsonObject("properties").getAsJsonObject("ids").add("items", JsonParser.parseString("{\"type\":\"string\"}"));
         return s;
     }
-    public String label(JsonObject a) { return "delete " + a.getAsJsonArray("ids").size() + " element(s)"; }
+    public String label(ModelLocator.Active m, JsonObject a) {
+        JsonArray ids = a.getAsJsonArray("ids");
+        if (ids.size() == 1) { JsonObject one = new JsonObject(); one.add("id", ids.get(0)); return "delete " + n(m, one, "id"); }
+        return "delete " + ids.size() + " elements";
+    }
 
     @Override public JsonObject execute(JsonObject a) throws Exception {
         if (!(a.has("dry_run") && a.get("dry_run").getAsBoolean())) return super.execute(a);
@@ -370,7 +375,7 @@ class BatchTool extends WriteTool {
         s.getAsJsonObject("properties").getAsJsonObject("operations").add("items", JsonParser.parseString("{\"type\":\"object\"}"));
         return s;
     }
-    public String label(JsonObject a) {
+    public String label(ModelLocator.Active m, JsonObject a) {
         return str(a, "label") != null ? str(a, "label") : "batch (" + a.getAsJsonArray("operations").size() + " ops)";
     }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
