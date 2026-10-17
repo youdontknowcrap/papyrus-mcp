@@ -1,0 +1,108 @@
+[
+ {
+  "name": "iconix_domain_model",
+  "file": "domain_model.md",
+  "description": "Build or refine the ICONIX domain model (classes, generalization, aggregation, no operations) in the open Papyrus model.",
+  "arguments": [
+   {
+    "name": "source",
+    "description": "Where the requirements come from (doc path, pasted text, or 'ask me').",
+    "required": false
+   },
+   {
+    "name": "package",
+    "description": "Package for domain classes (default 'Domain').",
+    "required": false
+   }
+  ]
+ },
+ {
+  "name": "iconix_use_cases",
+  "file": "use_cases.md",
+  "description": "Identify actors and verb-noun use cases, group them in packages (epics), associate them with actors, draw use case diagrams.",
+  "arguments": [
+   {
+    "name": "scope",
+    "description": "Which part of the system to cover (default: everything).",
+    "required": false
+   }
+  ]
+ },
+ {
+  "name": "iconix_narratives",
+  "file": "narratives.md",
+  "description": "Write basic and alternate courses for use cases and store them as comments on the use cases.",
+  "arguments": [
+   {
+    "name": "use_cases",
+    "description": "Comma-separated use case names (default: all without a narrative).",
+    "required": false
+   }
+  ]
+ },
+ {
+  "name": "iconix_robustness",
+  "file": "robustness.md",
+  "description": "Robustness analysis (Boundary/Control/Entity) for one use case: package, objects, links, diagram, rule check, domain update.",
+  "arguments": [
+   {
+    "name": "use_case",
+    "description": "Name or id of the use case.",
+    "required": true
+   }
+  ]
+ },
+ {
+  "name": "iconix_sequence",
+  "file": "sequence.md",
+  "description": "Design the sequence for one use case and allocate behavior (controls) to operations on classes.",
+  "arguments": [
+   {
+    "name": "use_case",
+    "description": "Name or id of the use case.",
+    "required": true
+   }
+  ]
+ },
+ {
+  "name": "iconix_review",
+  "file": "review.md",
+  "description": "Run an ICONIX milestone review: requirements, preliminary (after robustness) or critical (after sequence).",
+  "arguments": [
+   {
+    "name": "kind",
+    "description": "requirements | preliminary | critical",
+    "required": true
+   }
+  ]
+ },
+ {
+  "name": "agile_backlog_from_usecases",
+  "file": "backlog.md",
+  "description": "Turn the use case model into an agile backlog: epics = use case packages, stories = use cases/alternates, acceptance criteria from narratives.",
+  "arguments": [
+   {
+    "name": "output",
+    "description": "Where to write the backlog (default: Markdown in chat).",
+    "required": false
+   }
+  ]
+ },
+ {
+  "name": "sprint_plan",
+  "file": "sprint_plan.md",
+  "description": "Propose the next sprint: stories by value/risk/dependencies within capacity, plus the ICONIX work each still needs.",
+  "arguments": [
+   {
+    "name": "capacity",
+    "description": "Capacity in story points (default 20).",
+    "required": false
+   },
+   {
+    "name": "goal",
+    "description": "Optional sprint goal.",
+    "required": false
+   }
+  ]
+ }
+]

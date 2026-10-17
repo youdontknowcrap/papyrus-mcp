@@ -170,15 +170,19 @@ public final class Diagrams {
     /** Rough rendered size of a node, for layout when the view has no explicit size. */
     public static int[] estimateSize(Node n) {
         EObject e = n.getElement();
-        if (e instanceof Actor) return new int[]{60, 100};
-        if (e instanceof UseCase uc) return new int[]{Math.max(160, len(uc) * 8 + 40), 70};
+        // On a use case diagram an actor is a stick figure; elsewhere (e.g. a robustness class
+        // diagram) Papyrus draws it as a box with the name inside, so it needs room for the name.
+        boolean stick = n.getDiagram() != null && "UseCase".equals(n.getDiagram().getType());
+        if (e instanceof Actor) return stick ? new int[]{60, 100} : new int[]{Math.max(110, len(e) * 9 + 60), 70};
+        // Widths below leave room for the element icon and the stereotype label, so names are not clipped.
+        if (e instanceof UseCase uc) return new int[]{Math.max(170, len(uc) * 9 + 70), 70};
         int rows = 0;
         if (e instanceof Classifier c) {
             // association ends are drawn as edge labels, not compartment rows
             for (Object f : c.getFeatures()) if ((f instanceof Property p && p.getAssociation() == null) || f instanceof Operation) rows++;
             if (c instanceof org.eclipse.uml2.uml.Enumeration en) rows += en.getOwnedLiterals().size();
         }
-        int w = Math.max(140, Math.min(320, len(e) * 9 + 40));
+        int w = Math.max(140, Math.min(360, len(e) * 10 + 60));
         if (e instanceof Classifier c) for (Object f : c.getFeatures())
             if (f instanceof NamedElement ne && ne.getName() != null) w = Math.max(w, Math.min(360, ne.getName().length() * 8 + 90));
         return new int[]{w, Math.min(500, 60 + rows * 18 + (rows > 0 ? 20 : 0))};

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Profile xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_PYzzEMqDEfGXI-EA0I8zMA" name="ICONIX" URI="http://papyrus-mcp/profiles/ICONIX" metaclassReference="_PYzzIMqDEfGXI-EA0I8zMA">
+  <eAnnotations xmi:id="_PYzzEcqDEfGXI-EA0I8zMA" source="http://www.eclipse.org/uml2/2.0.0/UML">
+    <contents xmi:type="ecore:EPackage" xmi:id="_PYzzEsqDEfGXI-EA0I8zMA" name="ICONIX" nsURI="http://papyrus-mcp/profiles/ICONIX" nsPrefix="ICONIX">
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_PYzzE8qDEfGXI-EA0I8zMA" name="Boundary">
+        <eAnnotations xmi:id="_PYzzFMqDEfGXI-EA0I8zMA" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_PYzzIcqDEfGXI-EA0I8zMA"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_PYzzFcqDEfGXI-EA0I8zMA" name="base_Class" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_PYzzF8qDEfGXI-EA0I8zMA" name="Control">
+        <eAnnotations xmi:id="_PYzzGMqDEfGXI-EA0I8zMA" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_PYzzJcqDEfGXI-EA0I8zMA"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_PYzzGcqDEfGXI-EA0I8zMA" name="base_Class" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+      <eClassifiers xmi:type="ecore:EClass" xmi:id="_PYzzG8qDEfGXI-EA0I8zMA" name="Entity">
+        <eAnnotations xmi:id="_PYzzHMqDEfGXI-EA0I8zMA" source="http://www.eclipse.org/uml2/2.0.0/UML" references="_PYzzKcqDEfGXI-EA0I8zMA"/>
+        <eStructuralFeatures xmi:type="ecore:EReference" xmi:id="_PYzzHcqDEfGXI-EA0I8zMA" name="base_Class" ordered="false" lowerBound="1">
+          <eType xmi:type="ecore:EClass" href="http://www.eclipse.org/uml2/5.0.0/UML#//Class"/>
+        </eStructuralFeatures>
+      </eClassifiers>
+    </contents>
+  </eAnnotations>
+  <ownedComment xmi:id="_PYzzH8qDEfGXI-EA0I8zMA">
+    <body>ICONIX robustness analysis stereotypes. Boundary = screen/API the actor touches; Control = a piece of behavior (a verb); Entity = a domain class. Rules: actors talk only to boundaries; boundaries talk to controls; entities talk only to controls (no noun-to-noun links).</body>
+  </ownedComment>
+  <elementImport xmi:id="_PYzzIMqDEfGXI-EA0I8zMA">
+    <importedElement xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+  </elementImport>
+  <packagedElement xmi:type="uml:Stereotype" xmi:id="_PYzzIcqDEfGXI-EA0I8zMA" name="Boundary">
+    <ownedAttribute xmi:id="_PYzzIsqDEfGXI-EA0I8zMA" name="base_Class" association="_PYzzI8qDEfGXI-EA0I8zMA">
+      <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Extension" xmi:id="_PYzzI8qDEfGXI-EA0I8zMA" name="Class_Boundary" memberEnd="_PYzzJMqDEfGXI-EA0I8zMA _PYzzIsqDEfGXI-EA0I8zMA">
+    <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_PYzzJMqDEfGXI-EA0I8zMA" name="extension_Boundary" type="_PYzzIcqDEfGXI-EA0I8zMA" aggregation="composite" association="_PYzzI8qDEfGXI-EA0I8zMA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Stereotype" xmi:id="_PYzzJcqDEfGXI-EA0I8zMA" name="Control">
+    <ownedAttribute xmi:id="_PYzzJsqDEfGXI-EA0I8zMA" name="base_Class" association="_PYzzJ8qDEfGXI-EA0I8zMA">
+      <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Extension" xmi:id="_PYzzJ8qDEfGXI-EA0I8zMA" name="Class_Control" memberEnd="_PYzzKMqDEfGXI-EA0I8zMA _PYzzJsqDEfGXI-EA0I8zMA">
+    <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_PYzzKMqDEfGXI-EA0I8zMA" name="extension_Control" type="_PYzzJcqDEfGXI-EA0I8zMA" aggregation="composite" association="_PYzzJ8qDEfGXI-EA0I8zMA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Stereotype" xmi:id="_PYzzKcqDEfGXI-EA0I8zMA" name="Entity">
+    <ownedAttribute xmi:id="_PYzzKsqDEfGXI-EA0I8zMA" name="base_Class" association="_PYzzK8qDEfGXI-EA0I8zMA">
+      <type xmi:type="uml:Class" href="pathmap://UML_METAMODELS/UML.metamodel.uml#Class"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Extension" xmi:id="_PYzzK8qDEfGXI-EA0I8zMA" name="Class_Entity" memberEnd="_PYzzLMqDEfGXI-EA0I8zMA _PYzzKsqDEfGXI-EA0I8zMA">
+    <ownedEnd xmi:type="uml:ExtensionEnd" xmi:id="_PYzzLMqDEfGXI-EA0I8zMA" name="extension_Entity" type="_PYzzKcqDEfGXI-EA0I8zMA" aggregation="composite" association="_PYzzK8qDEfGXI-EA0I8zMA"/>
+  </packagedElement>
+</uml:Profile>

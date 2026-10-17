@@ -81,7 +81,8 @@ class AddToDiagramTool extends WriteTool {
     protected JsonObject schema() {
         JsonObject s = schema(new String[][]{{"diagram", "string", "Diagram id or name."},
             {"elements", "array", "[\"id\", ...] or [{id, x?, y?, w?, h?}, ...]"},
-            {"withRelationships", "boolean", "Also draw relationships among all shown elements (default true)."}}, "diagram");
+            {"withRelationships", "boolean", "Also draw relationships among all shown elements (default true)."},
+            {"relationshipKinds", "string", "Optional comma-separated metaclass names, e.g. Dependency: draw only these relationship kinds (a robustness diagram wants its Dependencies, not the Associations between entities)."}}, "diagram");
         s.getAsJsonObject("properties").getAsJsonObject("elements").add("items", new JsonObject());
         return s;
     }
@@ -120,6 +121,13 @@ class AddToDiagramTool extends WriteTool {
             added.add(r);
             ctx.touched(e);
         }
+        // relationshipKinds (optional, e.g. "Dependency"): draw only those relationship metaclasses.
+        // A robustness diagram wants its Dependencies but not the Associations between entities.
+        Set<String> onlyKinds = null;
+        if (a.has("relationshipKinds") && !a.get("relationshipKinds").isJsonNull()) {
+            onlyKinds = new HashSet<>();
+            for (String kindName : a.get("relationshipKinds").getAsString().split(",")) if (!kindName.isBlank()) onlyKinds.add(kindName.trim());
+        }
         if (!a.has("withRelationships") || a.get("withRelationships").getAsBoolean()) {
             Map<EObject, Node> shown = new LinkedHashMap<>();
             for (Object o : d.getChildren()) if (o instanceof Node n && n.getElement() != null) shown.put(n.getElement(), n);
@@ -127,6 +135,7 @@ class AddToDiagramTool extends WriteTool {
             for (EObject e : shown.keySet()) if (e instanceof Element el) rels.addAll(Diagrams.relationshipsOf(el));
             for (EObject r : rels) {
                 if (Diagrams.hasEdge(d, r)) continue;
+                if (onlyKinds != null && !onlyKinds.contains(r.eClass().getName())) continue;
                 EObject[] ends = Diagrams.ends(r);
                 if (ends == null || !shown.containsKey(ends[0]) || !shown.containsKey(ends[1])) continue;
                 Edge ed = Diagrams.createEdge(d, shown.get(ends[0]), shown.get(ends[1]), r, Diagrams.edgeHint(k, r), ph);

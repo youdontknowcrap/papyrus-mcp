@@ -8,8 +8,10 @@ HERE=$(cd "$(dirname "$0")/.." && pwd)
 JAR=$(ls -t "$HERE"/org.papyrus.mcp/dist/*.jar | head -1)
 VER=$(basename "$JAR" .jar); VER=${VER#org.papyrus.mcp_}
 pkill -f "configuration /tmp/pmcfg" || true; sleep 1
+# MODEL=/path/x.di opens that model instead (and never resets it).
+OPEN=${MODEL:-"$HERE/testmodel/MudHut Opener Am..di"}
 # Fresh test model each run (RESET=0 to keep edits): original file names so notation/aird refs resolve.
-if [ "${RESET:-1}" = 1 ]; then
+if [ -z "${MODEL:-}" ] && [ "${RESET:-1}" = 1 ]; then
   rm -f "$HERE"/testmodel/MudHut* "$HERE"/testmodel/*.mcp-changelog.json
   for e in di uml notation aird; do cp "/workspace/mudhut/papyrus-out/model.$e" "$HERE/testmodel/MudHut Opener Am..$e"; done
 fi
@@ -21,6 +23,6 @@ sed -i "s|^osgi.bundles=.*|&,reference\\\\:file\\\\:$JAR@4|" /tmp/pmcfg/config.i
 echo "org.eclipse.equinox.simpleconfigurator.exclusiveInstallation=false" >> /tmp/pmcfg/config.ini
 cd "$PAP"
 nohup xvfb-run -a -s "-screen 0 1600x1000x24" ./papyrus-desktop -configuration /tmp/pmcfg -data /tmp/pmws -nosplash \
-  -vmargs -Dpapyrus.mcp.port=7342 -Dpapyrus.mcp.testOpen="$HERE/testmodel/MudHut Opener Am..di" \
+  -vmargs -Dpapyrus.mcp.port=7342 -Dpapyrus.mcp.testOpen="$OPEN" \
   -Dpapyrus.mcp.changelogSidecar=true -Dpapyrus.mcp.debugTools=true -Dpapyrus.mcp.uiTimeoutMs=${UITIMEOUT:-3000} > /tmp/pm.log 2>&1 &
 echo "launched; MCP at http://127.0.0.1:7342/mcp (log /tmp/pm.log, /tmp/pmws/.metadata/.log)"

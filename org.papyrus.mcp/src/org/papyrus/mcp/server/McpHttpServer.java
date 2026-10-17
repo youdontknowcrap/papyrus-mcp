@@ -1,5 +1,7 @@
 package org.papyrus.mcp.server;
 
+import org.papyrus.mcp.util.Workflow;
+
 import com.google.gson.*;
 import com.sun.net.httpserver.*;
 import java.io.*;
@@ -116,12 +118,22 @@ public class McpHttpServer {
                     JsonObject toolsCap = new JsonObject();
                     toolsCap.addProperty("listChanged", false);
                     caps.add("tools", toolsCap);
+                    // Guided workflow: prompts (ready-made ICONIX/agile instructions) and
+                    // resources (the process checklist and a live status report).
+                    JsonObject listCap = new JsonObject();
+                    listCap.addProperty("listChanged", false);
+                    caps.add("prompts", listCap);
+                    JsonObject resCap = new JsonObject();
+                    resCap.addProperty("listChanged", false);
+                    resCap.addProperty("subscribe", false);
+                    caps.add("resources", resCap);
                     res.add("capabilities", caps);
                     JsonObject info = new JsonObject();
                     info.addProperty("name", "papyrus-mcp");
                     info.addProperty("version", "0.1.0");
                     res.add("serverInfo", info);
-                    res.addProperty("instructions", "Live control of the open Papyrus model. All edits are undoable (Ctrl+Z in Papyrus). Call list_packages first.");
+                    res.addProperty("instructions", "Live control of the open Papyrus model. All edits are undoable (Ctrl+Z in Papyrus). Call list_packages first. "
+                        + "For guided modeling read resource workflow://iconix, call workflow_status, and use the iconix_* / agile prompts.");
                     return JsonRpc.result(id, res);
                 }
                 case "ping": return JsonRpc.result(id, new JsonObject());
@@ -139,6 +151,31 @@ public class McpHttpServer {
                     Session.setCurrent(sid == null ? null : sessions.get(sid));
                     try { return JsonRpc.result(id, tools.call(name, args)); }
                     finally { Session.setCurrent(null); }
+                }
+                case "prompts/list": return JsonRpc.result(id, Workflow.listPrompts());
+                case "prompts/get": {
+                    try {
+                        return JsonRpc.result(id, Workflow.getPrompt(params.get("name").getAsString(),
+                            params.has("arguments") ? params.getAsJsonObject("arguments") : new JsonObject()));
+                    } catch (IllegalArgumentException bad) { return JsonRpc.error(id, -32602, bad.getMessage()); }
+                }
+                case "resources/list": return JsonRpc.result(id, Workflow.listResources());
+                case "resources/templates/list": {
+                    JsonObject r = new JsonObject();
+                    r.add("resourceTemplates", new JsonArray());
+                    return JsonRpc.result(id, r);
+                }
+                case "resources/read": {
+                    String uri = params.get("uri").getAsString();
+                    JsonObject stat = Workflow.readStatic(uri);
+                    if (stat != null) return JsonRpc.result(id, stat);
+                    if (uri.equals("workflow://status")) {
+                        // Same report as the workflow_status tool, for clients that prefer resources.
+                        JsonObject r = tools.call("workflow_status", new JsonObject());
+                        String text = r.getAsJsonArray("content").get(0).getAsJsonObject().get("text").getAsString();
+                        return JsonRpc.result(id, Workflow.contents(uri, "application/json", text));
+                    }
+                    return JsonRpc.error(id, -32002, "resource not found: " + uri);
                 }
                 default: return JsonRpc.error(id, -32601, "method not found: " + method);
             }

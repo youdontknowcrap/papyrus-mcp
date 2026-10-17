@@ -444,3 +444,73 @@ exactly what the remote bot did.
   * save, then reload with `RESET=0`, after which the diagrams are still there and still render
 
   PNGs are in `test/p5-images/`.
+
+## 16. Guided workflow: ICONIX + agile (prompts, resources, workflow_status)
+
+**Why.** MCP is not only for tools. Two other MCP features let a server *guide* a bot through
+a way of working:
+- **prompts** are ready-made instructions that the user or the bot picks from a menu;
+- **resources** are documents the bot can read.
+
+We use both, plus one checking tool, so any AI client follows the same ICONIX and agile process
+on any Papyrus model. Nothing here is specific to one project.
+
+**What the server now advertises** in `initialize` capabilities: `prompts` and `resources`.
+
+| MCP feature | Name | What it gives the bot |
+|---|---|---|
+| prompt | `iconix_domain_model` (source?, package?) | Steps to find problem nouns and build classes with generalization and aggregation. No operations yet. |
+| prompt | `iconix_use_cases` (scope?) | Steps for actors, verb-noun use cases, packages as epics, and use case diagrams. |
+| prompt | `iconix_narratives` (use_cases?) | The narrative format (basic course, alternate courses, postconditions, priority), stored with `set_comment`. |
+| prompt | `iconix_robustness` (use_case) | A robustness package linked to the use case, «Boundary»/«Control»/«Entity», the link rules, a diagram, and a rule check. |
+| prompt | `iconix_sequence` (use_case) | Lifelines and messages; controls become operations (`add_operation`). |
+| prompt | `iconix_review` (kind = requirements, preliminary or critical) | The three ICONIX milestone reviews, reported as PASS/FAIL items. |
+| prompt | `agile_backlog_from_usecases` (output?) | Epics from packages, stories from use cases, and Given/When/Then criteria from narratives. |
+| prompt | `sprint_plan` (capacity?, goal?) | Pick stories by value, risk and dependencies, and list the ICONIX work each still needs. |
+| resource | `workflow://iconix` | The process checklist: 5 stages, 3 reviews, and the agile mapping. |
+| resource | `workflow://iconix/conventions` | Where each artifact lives in the model, so tools can find it. |
+| resource | `workflow://agile` | Backlog, sprint, and Definition of Done. |
+| resource | `workflow://status` | Live JSON, the same as the tool below. |
+| tool | `workflow_status` (package?, limit?) | Inspects the model and reports each stage as done or missing, plus the findings below. Read-only. |
+| profile | `apply_profile profile="ICONIX"` | Bundled `profiles/ICONIX.profile.uml` with the stereotypes Boundary, Control and Entity, which extend Class. |
+
+**workflow_status findings:**
+- use cases without a narrative, without alternate courses, or without an actor;
+- use cases without robustness analysis, or whose robustness package has no diagram;
+- use cases without a sequence design;
+- «Entity» classes that are not domain classes;
+- classes inside robustness packages that are neither «Boundary» nor «Control»;
+- **robustness rule violations.** Allowed links: actor–boundary, boundary–control, control–control and control–entity. Everything else is flagged with the broken rule: an actor talking to anything except a boundary, boundary–boundary, boundary–entity, or entity–entity.
+
+The report also gives a one-sentence `next` that names the prompt to use.
+
+**How it finds things** (the conventions resource):
+- A narrative is a comment on the use case that contains "Basic course".
+- A robustness package is a package with a Dependency to the use case, or one named "Robustness - <use case>".
+- Domain classes are plain classes that are not «Boundary» or «Control» and are not inside a robustness package.
+- Links are checked wherever they are stored, as long as one end belongs to a robustness package. Papyrus stores an Actor→Boundary dependency next to the actor.
+
+**Where the text lives.** Everything is a plain file in the bundle, so it can be edited without Java:
+- `workflow/prompts.json` holds the menu: names, descriptions and arguments.
+- `workflow/prompts/*.md` hold the prompt texts, with `{{arg|default}}` placeholders.
+- `workflow/*.md` hold the resources.
+- `util/Workflow.java` serves them.
+- `build.sh` and `build.properties` copy `workflow/` and `profiles/` into the jar.
+- `test/fixtures/gen/MakeIconixProfile.java` regenerates the profile.
+
+**Other changes made in this round:**
+- `add_to_diagram relationshipKinds="Dependency"` draws only the listed relationship kinds. A robustness diagram should show its links, not the domain associations.
+- Size estimates are better for actors on class diagrams and for long names.
+- Every tool now checks its required arguments up front, so a bot gets a clear message instead of a NullPointerException.
+- The test launcher accepts `MODEL=/path/x.di`.
+
+**Tested** (`test/smoke_workflow.py`, output in `test/smoke-workflow-output.txt`):
+- capabilities, prompts/list, prompts/get, the missing-argument error (-32602), resources/list, resources/read, and the status resource;
+- ICONIX profile alias, with a seeded boundary→entity link that was caught;
+- the earlier smoke tests still pass.
+
+Dogfooded by building the MudHut ICONIX model, which has 22 use cases, 4 robustness analyses and 0 violations.
+
+**Limits:**
+- Sequence diagrams cannot be drawn yet (there is no sequence diagram kind). `iconix_sequence` records the design as a comment plus operations.
+- Exported PNGs under Xvfb can clip the last letter of a label. This is a font-metrics quirk of headless rendering; Papyrus on a desktop draws the labels in full.

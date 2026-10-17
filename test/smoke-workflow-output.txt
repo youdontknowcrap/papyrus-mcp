@@ -1,0 +1,36 @@
+
+### capabilities
+{"tools": {"listChanged": false}, "prompts": {"listChanged": false}, "resources": {"listChanged": false, "subscribe": false}}
+
+### prompts/list names
+["iconix_domain_model", "iconix_use_cases", "iconix_narratives", "iconix_robustness", "iconix_sequence", "iconix_review", "agile_backlog_from_usecases", "sprint_plan"]
+
+### prompts/get iconix_robustness
+"You are an expert ICONIX modeler. Do ROBUSTNESS ANALYSIS for use case \"Publish a Show\".\n\n1. `get_element` the use case and read its narrative. If there is none, write it first (prompt iconix_narratives).\n2. `apply_profile` profile=\"ICONIX\" on the model root if not applied yet.\n3. Create pac
+
+### prompts/get missing arg
+{"code": -32602, "message": "missing required argument: kind"}
+
+### resources/list
+["workflow://iconix", "workflow://iconix/conventions", "workflow://agile", "workflow://status"]
+
+### resources/read workflow://iconix
+"# ICONIX + agile workflow (checklist)\n\nICONIX is a short, use-case-driven path from requirements to code: four modeling steps, with a\nreview after each milestone. In an agile team each sprint runs
+
+### workflow_status (empty model)
+{"stages": [{"stage": "1 domain model", "status": "done", "detail": "36 domain classes"}, {"stage": "2 use cases", "status": "done", "detail": "16 use cases, 6 actors, 0 use cases without an actor"}, {"stage": "3 narratives (requirements review)", "status": "missing", "detail": "0/16 use cases have a narrative; 0 lack alternate courses"}, {"stage": "4 robustness (preliminary design review)", "status": "missing", "detail": "0/16 use cases have robustness analysis; 0 rule violations; ICONIX profile not applied (apply_profile profile=ICONIX)"}, {"stage": "5 sequence (critical design review)", "status": "missing", "detail": "0/16 use cases have a sequence design"}], "next": "Write narratives (prompt iconix_narratives), then run iconix_review kind=requirements.", "findings": {"useCasesWithoutNarrative": ["MudHut Opener Am::Generate Story", "MudHut Opener Am::Develop Script", "MudHut Opener Am::Cast Production", "MudHut Opener Am::Produce Vocal Performance", "MudHut Opener Am::Generate Visuals", "MudHut Opener Am::Edit Sequence", "MudHut Opener Am::Produce Soundtrack", "MudHut Opener Am::Manage Budget", "MudHut Opener Am::Wrap Into the Scene", "MudHut Opener Am::Alter the Voice", "MudHut Opener Am::Revise the Prompt", "MudHut Opener Am::Keep a Version", "MudHut Opener Am::Cut a Trailer", "MudHut Opener Am::Estimate the Budget", "MudHut Opener Am::Crowdsource the Movie", "MudHut Opener Am::Open the Release"], "narrativesWithoutAlternateCourses": [], "useCasesWithoutActor": [], "useC
+
+### resources/read workflow://status
+"{\"stages\":[{\"stage\":\"1 domain model\",\"status\":\"done\",\"detail\":\"36 domain classes\"},{\"stage\":\"2 use cases\",\"status\":\"done\",\"detail\":\"16 use cases, 6 actors, 0 use cases withou
+
+### find a use case
+{"total": 16, "elements": [{"id": "_H0sWgMl0EfGvWLiqtIhhHw", "metaclass": "UseCase", "name": "Generate Story", "qualifiedName": "MudHut Opener Am::Generate Story"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 0}
+
+### apply_profile ICONIX
+{"id": "_tsHLcMlwEfGvWLiqtIhhHw", "metaclass": "Model", "name": "MudHut Opener Am", "qualifiedName": "MudHut Opener Am", "profile": "ICONIX", "stereotypes": ["ICONIX::Boundary", "ICONIX::Control", "ICONIX::Entity"], "seq": 1, "undoLabel": "MCP: apply profile ICONIX to MudHut Opener Am", "model": "pl
+
+### workflow_status on MudHut test model (expect 1 violation)
+{"stages": [{"stage": "1 domain model", "status": "done", "detail": "37 domain classes"}, {"stage": "2 use cases", "status": "done", "detail": "16 use cases, 6 actors, 0 use cases without an actor"}, {"stage": "3 narratives (requirements review)", "status": "missing", "detail": "0/16 use cases have a narrative; 0 lack alternate courses"}, {"stage": "4 robustness (preliminary design review)", "status": "missing", "detail": "1/16 use cases have robustness analysis; 1 rule violations"}, {"stage": "5 sequence (critical design review)", "status": "missing", "detail": "0/16 use cases have a sequence design"}], "violations": [{"link": {"id": "_Kx75IMqEEfGFMIpBQG87bQ", "metaclass": "Dependency"}, "from": "Smoke Page (boundary)", "to": "Smoke Thing (entity)", "robustnessPackage": "Robustness - smoke", "rule": "boundary-entity: nouns never talk to nouns (put a control between)"}], "noNarrative": 16, "counts": {"useCases": 16, "actors": 6, "domainClasses": 37, "robustnessPackages": 1, "robustnessLinksChecked": 2, "iconixProfileApplied": true}}
+
+### missing required arg
+"ERROR: missing required argument 'set'; expected properties: [id, set, model, expected_version, expected_etags]"

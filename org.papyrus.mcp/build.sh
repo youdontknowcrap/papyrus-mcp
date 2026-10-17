@@ -11,5 +11,5 @@ javac --release 21 -nowarn -cp "$CP" -d bin $(find src -name '*.java')
 VER=0.1.0.$(date +%Y%m%d%H%M)
 sed "s/0.1.0.qualifier/$VER/" META-INF/MANIFEST.MF > bin/MANIFEST.tmp
 cp plugin.xml bin/
-jar cfm "dist/org.papyrus.mcp_$VER.jar" bin/MANIFEST.tmp -C bin org -C bin plugin.xml
+jar cfm "dist/org.papyrus.mcp_$VER.jar" bin/MANIFEST.tmp -C bin org -C bin plugin.xml -C . profiles -C . workflow
 echo "Built dist/org.papyrus.mcp_$VER.jar"

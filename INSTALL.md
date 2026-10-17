@@ -40,6 +40,21 @@ Both scripts take `PAPYRUS=...`, `JARDIR=...`, `PORT=...`, `TOKEN=...` if your p
   { "mcpServers": { "papyrus": { "command": "npx", "args": ["mcp-remote", "http://127.0.0.1:7341/mcp"] } } }
   ```
 
+
+## B2. Let the server guide your AI (ICONIX + agile workflow)
+
+The server also offers **prompts** and **resources**. They are ready-made instructions and
+checklists that make an AI follow the ICONIX modeling process and an agile backlog. Here is how to use them:
+
+1. In your AI client, look for the server's prompts. Claude Desktop shows them under the "+" /
+   attachment menu; in Claude Code type `/` and look for `papyrus-mcp`. Pick one, for example
+   `iconix_robustness`, and fill in the use case name.
+2. Or simply ask: *"Read workflow://iconix, then call workflow_status and tell me what to do next."*
+3. To use the Boundary / Control / Entity stereotypes in your model, ask the AI to run
+   `apply_profile` with profile `ICONIX`. The profile ships inside the plugin.
+
+`workflow_status` never changes your model. It only reports what is done and what is missing.
+
 ## C. Build it yourself from source (optional, needs Java 21 JDK)
 ```
 cd papyrus-mcp/org.papyrus.mcp

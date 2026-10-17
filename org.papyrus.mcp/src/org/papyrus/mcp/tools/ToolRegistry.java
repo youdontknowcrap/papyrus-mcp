@@ -43,6 +43,8 @@ public class ToolRegistry {
         r.add(new ApplyStereotypeTool());
         r.add(new UnapplyStereotypeTool());
         r.add(new ValidateTool());
+        // Guided workflow (ICONIX + agile): read-only progress report.
+        r.add(new WorkflowStatusTool());
         // Phase 5: GMF diagrams
         r.add(new CreateDiagramTool());
         r.add(new AddToDiagramTool());
@@ -82,6 +84,13 @@ public class ToolRegistry {
         Activator a = Activator.get();
         if (t.mutating() && a != null && a.getPreferenceStore().getBoolean(Prefs.READ_ONLY))
             return errorResult("server is in read-only mode");
+        // Check the schema's required arguments up front, so a bot gets "missing required
+        // argument 'set'" instead of a NullPointerException from deep inside the tool.
+        JsonObject schema = t.inputSchema();
+        if (schema.has("required")) for (JsonElement r : schema.getAsJsonArray("required"))
+            if (args == null || !args.has(r.getAsString()) || args.get(r.getAsString()).isJsonNull())
+                return errorResult("missing required argument '" + r.getAsString() + "'; expected properties: "
+                    + schema.getAsJsonObject("properties").keySet());
         try {
             JsonObject data = t.execute(args);
             JsonObject res = new JsonObject();

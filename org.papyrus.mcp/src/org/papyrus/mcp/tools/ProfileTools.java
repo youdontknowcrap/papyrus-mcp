@@ -27,7 +27,9 @@ final class ProfileUtil {
     static final Map<String, String> ALIASES = Map.of(
         "Standard", "pathmap://UML_PROFILES/Standard.profile.uml",
         "StandardProfile", "pathmap://UML_PROFILES/Standard.profile.uml",
-        "Ecore", "pathmap://UML_PROFILES/Ecore.profile.uml");
+        "Ecore", "pathmap://UML_PROFILES/Ecore.profile.uml",
+        // Shipped inside this plugin: ICONIX robustness stereotypes Boundary / Control / Entity.
+        "ICONIX", "platform:/plugin/org.papyrus.mcp/profiles/ICONIX.profile.uml");
 
     /**
      * Resolve a profile: (1) a profile already applied/loaded in the ModelSet by name or qualified
@@ -107,7 +109,7 @@ class ApplyProfileTool extends WriteTool {
     public String name() { return "apply_profile"; }
     public String description() {
         return "Apply a UML profile to a package (default: model root). profile = name of a loaded profile, alias "
-             + "(Standard, Ecore), or URI (pathmap://..., platform:/plugin/..., platform:/resource/..., file:/... or absolute path). Undoable.";
+             + "(Standard, Ecore, ICONIX), or URI (pathmap://..., platform:/plugin/..., platform:/resource/..., file:/... or absolute path). Undoable.";
     }
     protected JsonObject schema() {
         return schema(new String[][]{{"profile", "string", "Profile name/alias/URI."}, {"package", "string", "Target package id/qn (default model root)."},
