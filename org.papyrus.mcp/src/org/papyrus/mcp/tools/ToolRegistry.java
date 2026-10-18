@@ -51,6 +51,21 @@ public class ToolRegistry {
         r.add(new RemoveFromDiagramTool());
         r.add(new LayoutDiagramTool());
         r.add(new ExportDiagramImageTool());
+        // Behavior diagrams: sequence (fine-grained + build_sequence), activity, state machine.
+        r.add(new BuildSequenceTool());
+        r.add(new CreateInteractionTool());
+        r.add(new AddLifelineTool());
+        r.add(new AddMessageTool());
+        r.add(new AddExecutionTool());
+        r.add(new AddCombinedFragmentTool());
+        r.add(new AddInteractionUseTool());
+        r.add(new AddGateTool());
+        r.add(new AddStateInvariantTool());
+        r.add(new RemoveMessageTool());
+        r.add(new CreateSequenceDiagramTool());
+        r.add(new GetInteractionTool());
+        r.add(new BuildActivityTool());
+        r.add(new BuildStateMachineTool());
         if (Boolean.getBoolean("papyrus.mcp.debugTools")) { // test-only, see DebugTools.java
             r.add(new DebugBlockUiTool());
             r.add(new DebugOpenDialogTool());

@@ -21,6 +21,20 @@ rm -rf /tmp/pmcfg/org.eclipse.osgi /tmp/pmcfg/org.eclipse.core.runtime
 # simpleconfigurator not to uninstall bundles it doesn't know about.
 sed -i "s|^osgi.bundles=.*|&,reference\\\\:file\\\\:$JAR@4|" /tmp/pmcfg/config.ini
 echo "org.eclipse.equinox.simpleconfigurator.exclusiveInstallation=false" >> /tmp/pmcfg/config.ini
+# Label clipping fix (FONTFIX=0 to skip): the box's default "sans" is a variable font whose
+# measured width is a bit narrower than what gets drawn, so the last letter of labels was cut.
+# Point the usual UI font names at the static DejaVu Sans instead.
+if [ "${FONTFIX:-1}" = 1 ]; then
+  cat > /tmp/pmfonts.conf <<'XML'
+<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig><include ignore_missing="yes">/etc/fonts/fonts.conf</include>
+<match target="pattern"><test name="family"><string>Segoe UI</string></test><edit name="family" mode="assign" binding="strong"><string>DejaVu Sans</string></edit></match>
+<match target="pattern"><test name="family"><string>sans-serif</string></test><edit name="family" mode="prepend" binding="strong"><string>DejaVu Sans</string></edit></match>
+<match target="pattern"><test name="family"><string>Sans</string></test><edit name="family" mode="prepend" binding="strong"><string>DejaVu Sans</string></edit></match>
+</fontconfig>
+XML
+  export FONTCONFIG_FILE=/tmp/pmfonts.conf
+fi
 cd "$PAP"
 nohup xvfb-run -a -s "-screen 0 1600x1000x24" ./papyrus-desktop -configuration /tmp/pmcfg -data /tmp/pmws -nosplash \
   -vmargs -Dpapyrus.mcp.port=7342 -Dpapyrus.mcp.testOpen="$OPEN" \

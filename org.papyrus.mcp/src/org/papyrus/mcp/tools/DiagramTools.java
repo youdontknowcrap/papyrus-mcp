@@ -29,15 +29,19 @@ import org.papyrus.mcp.util.WriteSupport.Ctx;
 class CreateDiagramTool extends WriteTool {
     public String name() { return "create_diagram"; }
     public String description() {
-        return "Create a classic (GMF) Papyrus diagram: kind = class | usecase | component. Optionally open it in the editor. Undoable.";
+        return "Create a classic (GMF) Papyrus diagram: kind = class | usecase | component (empty canvas; then add_to_diagram), or sequence | activity | statemachine "
+             + "(drawn from the behavior given as owner; calling again with the same name redraws it). Optionally open it in the editor. Undoable.";
     }
     protected JsonObject schema() {
-        return schema(new String[][]{{"kind", "string", "class | usecase | component"}, {"owner", "string", "Owner/context element id/qn (default model root)."},
+        return schema(new String[][]{{"kind", "string", "class | usecase | component | sequence | activity | statemachine"}, {"owner", "string", "Owner/context element id/qn (default model root)."},
             {"name", "string", "Diagram name."}, {"open", "boolean", "Open it as an editor page (default true)."}}, "kind", "name");
     }
     public String label(ModelLocator.Active m, JsonObject a) { return "create " + str(a, "kind") + " diagram '" + str(a, "name") + "'"; }
     public JsonObject apply(Ctx ctx, JsonObject a) throws Exception {
-        Diagrams.Kind k = Diagrams.kind(need(a, "kind"));
+        String kindKey = need(a, "kind");
+        // Behavior diagrams are drawn from their behavior (owner = the Interaction / Activity / StateMachine).
+        for (Diagrams.Kind bk : Behaviors.ALL) if (bk.key().equals(kindKey)) return behaviorDiagram(ctx, a, bk);
+        Diagrams.Kind k = Diagrams.kind(kindKey);
         Element owner = ElementJson.resolve(ctx.m, str(a, "owner"));
         Diagram d = ViewService.createDiagram(owner, k.type(), Diagrams.prefHint(k));
         if (d == null) throw new IllegalStateException("Papyrus refused to create a " + k.key() + " diagram on " + owner.eClass().getName());
@@ -53,6 +57,27 @@ class CreateDiagramTool extends WriteTool {
         o.addProperty("kind", k.kindId());
         return o;
     }
+    private JsonObject behaviorDiagram(Ctx ctx, JsonObject a, Diagrams.Kind bk) {
+        Element owner = ElementJson.resolve(ctx.m, str(a, "owner"));
+        org.eclipse.emf.ecore.EClass want = bk == Behaviors.SEQUENCE ? org.eclipse.uml2.uml.UMLPackage.Literals.INTERACTION
+            : bk == Behaviors.ACTIVITY ? org.eclipse.uml2.uml.UMLPackage.Literals.ACTIVITY : org.eclipse.uml2.uml.UMLPackage.Literals.STATE_MACHINE;
+        org.eclipse.uml2.uml.Behavior beh = want.isInstance(owner) ? (org.eclipse.uml2.uml.Behavior) owner : null;
+        if (beh == null && owner instanceof org.eclipse.uml2.uml.BehavioredClassifier bc)
+            for (org.eclipse.uml2.uml.Behavior b : bc.getOwnedBehaviors()) if (want.isInstance(b)) { beh = b; break; }
+        if (beh == null) throw new IllegalArgumentException("a " + bk.key() + " diagram is drawn from a " + want.getName()
+            + ": pass owner=<" + want.getName() + " id> (create one with " + (bk == Behaviors.SEQUENCE ? "build_sequence or create_interaction" : bk == Behaviors.ACTIVITY ? "build_activity" : "build_state_machine") + ")");
+        Diagram d = Behaviors.diagramFor(ctx.m, bk, beh, str(a, "name"));
+        JsonObject r = bk == Behaviors.SEQUENCE ? Sequences.render(d, (org.eclipse.uml2.uml.Interaction) beh, null)
+            : bk == Behaviors.ACTIVITY ? Activities.render(d, (org.eclipse.uml2.uml.Activity) beh, "TB")
+            : StateMachines.render(d, (org.eclipse.uml2.uml.StateMachine) beh);
+        r.addProperty("id", d.eResource().getURIFragment(d));
+        r.addProperty("name", d.getName());
+        r.addProperty("type", d.getType());
+        ctx.touched(beh);
+        ctx.summaries.add("drew " + bk.key() + " diagram '" + d.getName() + "'");
+        return r;
+    }
+
     @Override public JsonObject execute(JsonObject a) throws Exception {
         JsonObject r = super.execute(a);
         if (!a.has("open") || a.get("open").getAsBoolean()) {
@@ -311,7 +336,8 @@ class ExportDiagramImageTool extends ReadTool {
             Path tmp = Files.createTempFile("papyrus-mcp-", "." + fmt);
             try {
                 PreferencesHint ph;
-                try { ph = Diagrams.prefHint(Diagrams.kindOf(d)); } catch (Exception e) { ph = PreferencesHint.USE_DEFAULTS; }
+                Diagrams.Kind bk = Behaviors.kindOf(d);
+                try { ph = Diagrams.prefHint(bk != null ? bk : Diagrams.kindOf(d)); } catch (Exception e) { ph = PreferencesHint.USE_DEFAULTS; }
                 new org.eclipse.gmf.runtime.diagram.ui.render.util.CopyToImageUtil().copyToImage(
                         d, new org.eclipse.core.runtime.Path(tmp.toString()), iff, new org.eclipse.core.runtime.NullProgressMonitor(), ph);
                 byte[] bytes = Files.readAllBytes(tmp);

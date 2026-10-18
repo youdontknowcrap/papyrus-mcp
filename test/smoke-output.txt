@@ -1,6 +1,6 @@
 
 ### tools/list
-["ping", "list_open_models", "list_packages", "get_element", "list_elements", "find_elements", "get_relationships", "get_stereotypes", "list_diagrams", "get_selection", "get_changelog", "create_element", "create_relationship", "add_property", "add_operation", "add_enumeration_literal", "update_element", "set_comment", "move_element", "delete_elements", "batch", "undo", "redo", "save", "apply_profile", "apply_stereotype", "unapply_stereotype", "validate", "create_diagram", "add_to_diagram", "remove_from_diagram", "layout_diagram", "export_diagram_image", "debug_block_ui", "debug_open_dialog"]
+["ping", "list_open_models", "list_packages", "get_element", "list_elements", "find_elements", "get_relationships", "get_stereotypes", "list_diagrams", "get_selection", "get_changelog", "create_element", "create_relationship", "add_property", "add_operation", "add_enumeration_literal", "update_element", "set_comment", "move_element", "delete_elements", "batch", "undo", "redo", "save", "apply_profile", "apply_stereotype", "unapply_stereotype", "validate", "workflow_status", "create_diagram", "add_to_diagram", "remove_from_diagram", "layout_diagram", "export_diagram_image", "build_sequence", "create_interaction", "add_lifeline", "add_message", "add_execution", "add_combined_fragment", "add_int
 
 ### list_open_models
 {"models": [{"title": "MudHut Opener Am..di", "restored": true, "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "rootName": "MudHut Opener Am", "modelVersion": 0, "dirty": false, "active": true}]}

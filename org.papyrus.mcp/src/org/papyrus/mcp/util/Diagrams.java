@@ -41,7 +41,7 @@ public final class Diagrams {
     public static Kind kind(String key) {
         Kind k = KINDS.get(key);
         if (k == null) throw new IllegalArgumentException("unsupported diagram kind '" + key + "' (supported: " + KINDS.keySet()
-            + "; activity/statemachine/sequence need frame nodes and come later)");
+            + ", or sequence/activity/statemachine via create_diagram owner=<behavior> or the build_* tools)");
         return k;
     }
 

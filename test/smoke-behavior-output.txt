@@ -1,0 +1,43 @@
+
+### build_sequence
+{"interaction": {"id": "_NoIwkMqMEfGOG9AiYWHQUw", "metaclass": "Interaction", "name": "Buy Things - sequence", "qualifiedName": "MudHut Opener Am::BehaviorTest::Buy Things::Buy Things - sequence"}, "owner": {"id": "_Nn-YgMqMEfGOG9AiYWHQUw", "metaclass": "UseCase", "name": "Buy Things", "qualifiedName": "MudHut Opener Am::BehaviorTest::Buy Things"}, "lifelines": 5, "messages": 11, "createdOperations": ["Cart Page::pressBuy", "Checkout::start", "Order::addLine", "Payment Gateway::charge", "Order::markPaid", "Cart Page::showError"], "diagram": {"lifelines": 5, "messages": 11, "executions": 5, "combinedFragments": 2, "interactionUses": 0, "stateInvariants": 1, "gates": 1, "id": "_Noze8MqMEfGOG9AiYWHQUw", "name": "Buy Things - sequence"}, "seq": 10, "undoLabel": "MCP: build sequence 'Buy Things - sequence'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 10}
+1. Shopper -> Cart Page: pressBuy [synchCall]
+2. Cart Page -> Checkout: start [synchCall]
+3. Checkout -> Order: create [createMessage]
+5. Checkout -> Payment Gateway: charge [synchCall]
+6. Payment Gateway -> Checkout: status [reply]
+10. Checkout -> Cart Page: order [reply]
+11. gate:notify -> Shopper: emailReceipt [asynchSignal]
+[('execution', None), ('execution', None), ('fragment', 'loop'), ('execution', None), ('fragment', 'alt'), ('stateInvariant', None)]
+png seq-build
+
+### create_sequence_diagram Refund
+{"lifelines": 2, "messages": 2, "executions": 1, "combinedFragments": 1, "interactionUses": 0, "stateInvariants": 1, "gates": 0, "id": "_N365AMqMEfGOG9AiYWHQUw", "name": "Refund", "seq": 20, "undoLabel": "MCP: draw sequence diagram Refund", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 20}
+
+### redraw Buy Things
+{"lifelines": 5, "messages": 11, "executions": 5, "combinedFragments": 2, "interactionUses": 1, "stateInvariants": 1, "gates": 1, "id": "_Noze8MqMEfGOG9AiYWHQUw", "name": "Buy Things - sequence", "seq": 21, "undoLabel": "MCP: draw sequence diagram Buy Things - sequence", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 21}
+png seq-fine
+png seq-build-redrawn
+
+### build_activity
+{"activity": {"id": "_OJIk0MqMEfGOG9AiYWHQUw", "metaclass": "Activity", "name": "Checkout Flow", "qualifiedName": "MudHut Opener Am::BehaviorTest::Checkout Flow"}, "nodesCreated": 10, "flowsCreated": 11, "diagram": {"nodes": 10, "flows": 11, "swimlanes": 2, "id": "_OJWnQMqMEfGOG9AiYWHQUw", "name": "Checkout Flow"}, "seq": 22, "undoLabel": "MCP: build activity 'Checkout Flow'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 22}
+png activity
+
+### build_state_machine
+{"stateMachine": {"id": "_OQlQoMqMEfGOG9AiYWHQUw", "metaclass": "StateMachine", "name": "Order Life", "qualifiedName": "MudHut Opener Am::BehaviorTest::Order::Order Life"}, "verticesCreated": 10, "transitionsCreated": 9, "diagram": {"vertices": 10, "transitions": 9, "id": "_OQw20MqMEfGOG9AiYWHQUw", "name": "Order Life"}, "seq": 23, "undoLabel": "MCP: build state machine 'Order Life'", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 23}
+png statemachine
+
+### validate BehaviorTest
+{"errors": 0, "warnings": 0}
+
+### undo build_state_machine (one step)
+{"undone": "MCP: build state machine 'Order Life'", "seq": 24, "modelVersion": 24}
+
+### redo
+{"redone": "MCP: build state machine 'Order Life'", "seq": 25, "modelVersion": 25}
+
+### changelog tail
+["drew sequence diagram Refund", "drew sequence diagram Buy Things - sequence", "built activity 'Checkout Flow' (+10 nodes, +11 flows)", "built state machine 'Order Life' (+10 vertices, +9 transitions)", "undo 'MCP: build state machine 'Order Life''", "redo 'MCP: build state machine 'Order Life''"]
+
+### save
+{"saved": true, "dirty": false, "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml"}

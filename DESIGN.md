@@ -514,3 +514,50 @@ Dogfooded by building the MudHut ICONIX model, which has 22 use cases, 4 robustn
 **Limits:**
 - Sequence diagrams cannot be drawn yet (there is no sequence diagram kind). `iconix_sequence` records the design as a comment plus operations.
 - Exported PNGs under Xvfb can clip the last letter of a label. This is a font-metrics quirk of headless rendering; Papyrus on a desktop draws the labels in full.
+
+## 17. Behavior diagrams as built: sequence, activity, state machine
+
+**Idea.** An AI should not place shapes by pixels. It describes the behavior (who calls whom, in
+what order, under which guard) and the plugin builds the UML model *and* draws the diagram in one
+undoable step. Small tools exist too, for editing an existing interaction message by message.
+
+**Sequence tools.**
+- `build_sequence`: one JSON script → Interaction, lifelines, messages, execution bars, combined
+  fragments, interaction uses, gates, state invariants, notes, and the diagram. Main fields:
+  `name`, `owner` (use case, classifier or package), `robustness` (lifeline names resolve to the
+  classes of that robustness package and the domain), `narrative` (true = copy the use case text into
+  the left margin), `lifelines`, `steps`, `create_operations` (add missing operations to the
+  receiving class), `replace` (rebuild a design). A step is a message
+  `{"from","to","msg":"op(args)","sort","returns","steps":[nested calls]}`, a fragment
+  `{"fragment":"alt|opt|loop|par|break","operands":[{"guard","steps"}]}` (or `guard`+`steps` for one
+  operand), `{"ref": "Other interaction"}`, `{"invariant": "...", "on": "Lifeline"}` or `{"note": "..."}`.
+  `from: "gate:name"` makes a gate on the frame.
+- Fine-grained: `create_interaction`, `add_lifeline`, `add_message` (after a message, inside an operand,
+  inside an execution), `add_execution`, `add_combined_fragment` (can move existing messages into its
+  operands), `add_interaction_use`, `add_gate`, `add_state_invariant`, `remove_message`,
+  `create_sequence_diagram` (redraw; keeps the diagram id), `get_interaction` (read the tree back).
+- `create_diagram kind=sequence|activity|statemachine` also works on a behavior.
+
+**How it draws (util/Sequences.render).** Time order is the order of the fragments in the UML model.
+A "plan" walk gives every occurrence a y position (40 px per message, extra space for fragment
+headers). Lifelines are columns sized from their "name : Type" label. Execution bars run from their
+start to their finish occurrence and shift 6 px right when nested. Fragment frames span the lifelines
+they cover; operand views are reused if Papyrus already created them. Messages are GMF edges whose
+anchors sit at the planned y on each lifeline. Message labels show only "name(arguments)" (a
+`maskLabel` style), so untyped parameters do not print `<Undefined>`.
+
+**Activity and state machine.** `build_activity` (nodes: initial, final, flowfinal, action, call,
+decision, merge, fork, join, accept, send, buffer, datastore; partitions as swimlanes; guarded flows)
+and `build_state_machine` (nested composite states, entry/do/exit, triggers as signal events, guards,
+effects). Both lay out with Graphviz `dot`, so `dot` must be installed for nice layouts.
+
+**Tests.** `test/smoke_behavior.py` (all tools, validate 0 errors / 0 warnings, single-step undo/redo,
+save) then relaunch with `RESET=0` and `test/reload_behavior.py` (read back, validate, re-export).
+
+**Label clipping.** On the Linux box the default "sans" font was a variable font; labels lost their
+last letter in exports. `test/launch-papyrus-test.sh` now points the UI fonts at DejaVu Sans
+(FONTFIX=0 turns that off). On a normal desktop this is not needed.
+
+**Limits.** Message rows are evenly spaced (no free positioning); guard labels in narrow operands may
+be cut; Papyrus may re-route edges if a user drags lifelines later; duration/time constraints,
+coregions and general orderings are not supported yet.

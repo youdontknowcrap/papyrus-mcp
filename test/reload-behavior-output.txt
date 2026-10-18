@@ -1,0 +1,9 @@
+
+### get_interaction after reopen
+{"lifelines": 5, "messages": 11}
+
+### validate after reopen
+{"errors": 0, "warnings": 0}
+png seq-reopened OK
+png activity-reopened OK
+png statemachine-reopened OK

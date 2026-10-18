@@ -3,43 +3,43 @@
 {"pong": true, "modelOpen": true, "model": "MudHut Opener Am", "resource": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "dirty": false}
 
 ### create_element Class
-{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe", "qualifiedName": "MudHut Opener Am::Domain::McpProbe", "etag": "2c0d4acbff4f", "seq": 1, "undoLabel": "MCP: create Class McpProbe", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 1}
+{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe", "qualifiedName": "MudHut Opener Am::Domain::McpProbe", "etag": "2c0d4acbff4f", "seq": 1, "undoLabel": "MCP: create Class McpProbe", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 1}
 
 ### add_property
-{"id": "_sh7QcMmVEfGaVvXHN_iryA", "metaclass": "Property", "name": "count", "qualifiedName": "MudHut Opener Am::Domain::McpProbe::count", "etag": "e2d18cc883b6", "seq": 2, "undoLabel": "MCP: add property McpProbe.count", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 2}
+{"id": "_dac9UMqNEfGD_ZEax5iKnw", "metaclass": "Property", "name": "count", "qualifiedName": "MudHut Opener Am::Domain::McpProbe::count", "etag": "0e9f68ad4254", "seq": 2, "undoLabel": "MCP: add property McpProbe.count", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 2}
 
 ### add_operation
-{"id": "_siBXEMmVEfGaVvXHN_iryA", "metaclass": "Operation", "name": "ping", "qualifiedName": "MudHut Opener Am::Domain::McpProbe::ping", "etag": "1e102118d807", "seq": 3, "undoLabel": "MCP: add operation McpProbe.ping()", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 3}
+{"id": "_dah10MqNEfGD_ZEax5iKnw", "metaclass": "Operation", "name": "ping", "qualifiedName": "MudHut Opener Am::Domain::McpProbe::ping", "etag": "b9ebbfbee230", "seq": 3, "undoLabel": "MCP: add operation McpProbe.ping()", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 3}
 
 ### create Enumeration
-{"id": "_siJ58MmVEfGaVvXHN_iryA", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpColor", "etag": "4e315614a485", "seq": 4, "undoLabel": "MCP: create Enumeration McpColor", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 4}
+{"id": "_daqYsMqNEfGD_ZEax5iKnw", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpColor", "etag": "4e315614a485", "seq": 4, "undoLabel": "MCP: create Enumeration McpColor", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 4}
 
 ### add_enumeration_literal
-{"id": "_siPZgMmVEfGaVvXHN_iryA", "metaclass": "EnumerationLiteral", "name": "RED", "qualifiedName": "MudHut Opener Am::Domain::McpColor::RED", "etag": "4b54a5991ad5", "seq": 5, "undoLabel": "MCP: add literal McpColor::RED", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 5}
+{"id": "_dawfUMqNEfGD_ZEax5iKnw", "metaclass": "EnumerationLiteral", "name": "RED", "qualifiedName": "MudHut Opener Am::Domain::McpColor::RED", "etag": "b381cb6cc97b", "seq": 5, "undoLabel": "MCP: add literal McpColor::RED", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 5}
 
 ### create_relationship Association
-{"id": "_siUSAMmVEfGaVvXHN_iryA", "metaclass": "Association", "etag": "849c7ccf5a7f", "seq": 6, "undoLabel": "MCP: create Association McpProbe -> Scene", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 6}
+{"id": "_da0JsMqNEfGD_ZEax5iKnw", "metaclass": "Association", "etag": "d548f5246b7c", "seq": 6, "undoLabel": "MCP: create Association McpProbe -> Scene", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 6}
 
 ### create_relationship Generalization
-{"id": "_sibmwMmVEfGaVvXHN_iryA", "metaclass": "Generalization", "etag": "b6e4d6621a03", "seq": 7, "undoLabel": "MCP: create Generalization Scene -> McpProbe", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 7}
+{"id": "_da6QUMqNEfGD_ZEax5iKnw", "metaclass": "Generalization", "etag": "b222bf5d2336", "seq": 7, "undoLabel": "MCP: create Generalization Scene -> McpProbe", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 7}
 
 ### create_relationship Dependency
-{"id": "_sif4MMmVEfGaVvXHN_iryA", "metaclass": "Dependency", "name": "uses", "qualifiedName": "MudHut Opener Am::Domain::uses", "etag": "06ce14353489", "seq": 8, "undoLabel": "MCP: create Dependency McpProbe -> McpColor", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 8}
+{"id": "_da96sMqNEfGD_ZEax5iKnw", "metaclass": "Dependency", "name": "uses", "qualifiedName": "MudHut Opener Am::Domain::uses", "etag": "b9f90930d24d", "seq": 8, "undoLabel": "MCP: create Dependency McpProbe -> McpColor", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 8}
 
 ### update_element
-{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2", "etag": "f2f9a8fc5b77", "seq": 9, "undoLabel": "MCP: update McpProbe [name, visibility]", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 9}
+{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2", "etag": "b132e9b82106", "seq": 9, "undoLabel": "MCP: update McpProbe [name, visibility]", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 9}
 
 ### set_comment
-{"id": "_sippMMmVEfGaVvXHN_iryA", "metaclass": "Comment", "etag": "8ac9ba1f946f", "seq": 10, "undoLabel": "MCP: comment on McpProbe2", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 10}
+{"id": "_dbGdkMqNEfGD_ZEax5iKnw", "metaclass": "Comment", "etag": "8850b58128d0", "seq": 10, "undoLabel": "MCP: comment on McpProbe2", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 10}
 
 ### move_element
-{"id": "_siJ58MmVEfGaVvXHN_iryA", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpSub::McpColor", "etag": "c81d3c716d66", "seq": 12, "undoLabel": "MCP: move McpColor to McpSub", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 12}
+{"id": "_daqYsMqNEfGD_ZEax5iKnw", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpSub::McpColor", "etag": "d5535942d9f5", "seq": 12, "undoLabel": "MCP: move McpColor to McpSub", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 12}
 
 ### get_element after edits
-{"element": {"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2", "etag": "d61a0975f2a9", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "properties": {"name": "McpProbe2", "visibility": "package", "isAbstract": true}, "comments": [{"id": "_sippMMmVEfGaVvXHN_iryA", "body": "Created by the MCP edit test.", "owned": true}], "stereotypes": [], "relationships": [{"id": "_sif4MMmVEfGaVvXHN_iryA", "metaclass": "Dependency", "name": "uses", "qualifiedName": "MudHut Opener Am::Domain::uses", "sources": [{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "targets": [{"id": "_siJ58MmVEfGaVvXHN_iryA", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpSub::McpColor"}], "direction": "out"}, {"id": "_sibmwMmVEfGaVvXHN_iryA", "metaclass": "Generalization", "sources": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "targets": [{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "direction": "in"}, {"id": "_siUSAMmVEfGaVvXHN_iryA", "metaclass": "Association", "ends": [{"id": "_siVgIMmVEfGaVvXHN_iryA", "name": "scenes", "type": {"id": "_mh_cls_0467", "metaclass": "Clas
+{"element": {"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2", "etag": "be7fc84d7390", "owner": {"id": "_mh_pkg_0431", "metaclass": "Package", "name": "Domain", "qualifiedName": "MudHut Opener Am::Domain"}, "properties": {"name": "McpProbe2", "visibility": "package", "isAbstract": true}, "comments": [{"id": "_dbGdkMqNEfGD_ZEax5iKnw", "body": "Created by the MCP edit test.", "owned": true}], "stereotypes": [], "relationships": [{"id": "_da96sMqNEfGD_ZEax5iKnw", "metaclass": "Dependency", "name": "uses", "qualifiedName": "MudHut Opener Am::Domain::uses", "sources": [{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "targets": [{"id": "_daqYsMqNEfGD_ZEax5iKnw", "metaclass": "Enumeration", "name": "McpColor", "qualifiedName": "MudHut Opener Am::Domain::McpSub::McpColor"}], "direction": "out"}, {"id": "_da6QUMqNEfGD_ZEax5iKnw", "metaclass": "Generalization", "sources": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "targets": [{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "direction": "in"}, {"id": "_da0JsMqNEfGD_ZEax5iKnw", "metaclass": "Association", "ends": [{"id": "_da0wwMqNEfGD_ZEax5iKnw", "name": "scenes", "type": {"id": "_mh_cls_0467", "metaclass": "Clas
 
 ### B update with stale etag
-"ERROR: StaleEditException: stale edit: element _shoVgMmVEfGaVvXHN_iryA changed (etag now d61a0975f2a9)"
+"ERROR: StaleEditException: stale edit: element _daKCYMqNEfGD_ZEax5iKnw changed (etag now be7fc84d7390)"
 
 ### B update with stale version
 "ERROR: StaleEditException: stale edit: model version is 12, expected 11. Re-read (get_changelog / get_element) and retry."
@@ -57,7 +57,7 @@
 {"delete": [{"id": "_mh_cls_0467", "metaclass": "Class", "name": "Scene", "qualifiedName": "MudHut Opener Am::Domain::Scene"}], "ownedElementsAlsoDeleted": 56, "relationshipsAffected": [{"id": "_mh_asc_0663", "metaclass": "Association", "name": "Production has scenes", "qualifiedName": "MudHut Opener Am::Domain::Production has scenes"}, {"id": "_mh_asc_0677", "metaclass": "Association", "name": "Scene has beats", "qualifiedName": "MudHut Opener Am::Domain::Scene has beats"}, {"id": "_mh_asc_0698", "metaclass": "Association", "name": "Scene is dressed by a setting", "qualifiedName": "MudHut Opener Am::Domain::Scene is dressed by a setting"}, {"id": "_mh_asc_0719", "metaclass": "Association", "name": "Scene includes characters", "qualifiedName": "MudHut Opener Am::Domain::Scene includes characters"}, {"id": "_mh_asc_0754", "metaclass": "Association", "name": "Scene has takes", "qualifiedNa
 
 ### delete probe
-{"deleted": [{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "seq": 15, "undoLabel": "MCP: delete McpProbe2", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 15}
+{"deleted": [{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "seq": 15, "undoLabel": "MCP: delete McpProbe2", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 15}
 
 ### find probe after delete
 {"total": 0, "elements": [], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 15}
@@ -66,10 +66,10 @@
 {"undone": "MCP: delete McpProbe2", "seq": 16, "modelVersion": 16}
 
 ### find probe after undo
-{"total": 1, "elements": [{"id": "_shoVgMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 16}
+{"total": 1, "elements": [{"id": "_daKCYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "McpProbe2", "qualifiedName": "MudHut Opener Am::Domain::McpProbe2"}], "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 16}
 
 ### batch (3 ops)
-{"results": [{"id": "_sndQsMmVEfGaVvXHN_iryA", "metaclass": "Class", "name": "Lamp", "qualifiedName": "MudHut Opener Am::Domain::Lamp", "etag": "af25a2ff5565"}, {"id": "_snee0MmVEfGaVvXHN_iryA", "metaclass": "Property", "name": "watts", "qualifiedName": "MudHut Opener Am::Domain::Lamp::watts", "etag": "ac81b705aea7"}, {"id": "_snfF4MmVEfGaVvXHN_iryA", "metaclass": "Association", "etag": "9abfe58967ba"}], "seq": 17, "undoLabel": "MCP: add Lamp model", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 17}
+{"results": [{"id": "_dgabYMqNEfGD_ZEax5iKnw", "metaclass": "Class", "name": "Lamp", "qualifiedName": "MudHut Opener Am::Domain::Lamp", "etag": "af25a2ff5565"}, {"id": "_dgbpgMqNEfGD_ZEax5iKnw", "metaclass": "Property", "name": "watts", "qualifiedName": "MudHut Opener Am::Domain::Lamp::watts", "etag": "ac81b705aea7"}, {"id": "_dgbpgcqNEfGD_ZEax5iKnw", "metaclass": "Association", "etag": "e61e20401987"}], "seq": 17, "undoLabel": "MCP: add Lamp model", "model": "platform:/resource/mcp-test/MudHut%20Opener%20Am..uml", "modelVersion": 17}
 
 ### batch failing op 2 (all rolled back)
 "ERROR: IllegalStateException: op 2 (add_property) failed: element not found: nope"

@@ -53,6 +53,10 @@ checklists that make an AI follow the ICONIX modeling process and an agile backl
 3. To use the Boundary / Control / Entity stereotypes in your model, ask the AI to run
    `apply_profile` with profile `ICONIX`. The profile ships inside the plugin.
 
+4. For sequence diagrams ask for `build_sequence` (prompt `iconix_sequence`). Activity and state
+   machine diagrams use `build_activity` and `build_state_machine`. These need Graphviz (`dot`)
+   installed for a tidy layout (Linux: `sudo apt install graphviz`, macOS: `brew install graphviz`).
+
 `workflow_status` never changes your model. It only reports what is done and what is missing.
 
 ## C. Build it yourself from source (optional, needs Java 21 JDK)

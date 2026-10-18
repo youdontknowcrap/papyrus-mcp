@@ -94,7 +94,8 @@ public class WorkflowStatusTool extends ReadTool {
 
         // ---- 5. Per use case findings ---------------------------------------------------------
         JsonArray noNarrative = new JsonArray(), noAlternate = new JsonArray(), noActor = new JsonArray(),
-                  noRobust = new JsonArray(), robustNoDiagram = new JsonArray(), noSequence = new JsonArray();
+                  noRobust = new JsonArray(), robustNoDiagram = new JsonArray(), noSequence = new JsonArray(),
+                  messagesNoOp = new JsonArray(), controlsNotAllocated = new JsonArray();
         int narrated = 0, robusted = 0, sequenced = 0;
         for (UseCase uc : useCases) {
             String text = commentsText(uc).toLowerCase(Locale.ROOT);
@@ -108,6 +109,30 @@ public class WorkflowStatusTool extends ReadTool {
             boolean seq = text.contains("sequence:");
             for (Behavior b : uc.getOwnedBehaviors()) if (b instanceof Interaction) seq = true;
             if (seq) sequenced++; else add(noSequence, uc, limit);
+            // Allocation (ICONIX stage 5): every call message should invoke a real operation, and
+            // every control from the robustness diagram should show up as a message (an operation).
+            Set<String> called = new HashSet<>();
+            for (Behavior b : uc.getOwnedBehaviors()) if (b instanceof Interaction in) {
+                for (Message msg : in.getMessages()) {
+                    if (msg.getName() != null) called.add(squash(msg.getName()));
+                    if (msg.getSignature() != null) called.add(squash(msg.getSignature().getName()));
+                    MessageSort ms = msg.getMessageSort();
+                    boolean call = ms == MessageSort.SYNCH_CALL_LITERAL || ms == MessageSort.ASYNCH_CALL_LITERAL;
+                    // a call to an actor (a person) is shown to them, not an operation on a class
+                    boolean toActor = msg.getReceiveEvent() instanceof MessageOccurrenceSpecification rv
+                        && rv.getCovered() != null && rv.getCovered().getRepresents() != null
+                        && rv.getCovered().getRepresents().getType() instanceof Actor;
+                    if (call && !toActor && msg.getSignature() == null && messagesNoOp.size() < limit) {
+                        JsonObject o = new JsonObject();
+                        o.addProperty("message", msg.getName());
+                        o.addProperty("interaction", in.getName());
+                        messagesNoOp.add(o);
+                    }
+                }
+                if (rp != null) for (Element e : rp.allOwnedElements())
+                    if (e instanceof Class ctl && has(ctl, "Control") && !called.contains(squash(ctl.getName())))
+                        add(controlsNotAllocated, ctl, limit);
+            }
         }
 
         // ---- 6. Robustness checks: entities and link rules ------------------------------------
@@ -158,7 +183,8 @@ public class WorkflowStatusTool extends ReadTool {
             robusted + "/" + useCases.size() + " use cases have robustness analysis; " + violations.size() + " rule violations"
             + (profileApplied ? "" : "; ICONIX profile not applied (apply_profile profile=ICONIX)"));
         stage(stages, "5 sequence (critical design review)", sequenced > 0 && sequenced >= robusted,
-            sequenced + "/" + useCases.size() + " use cases have a sequence design");
+            sequenced + "/" + useCases.size() + " use cases have a sequence design; " + controlsNotAllocated.size()
+            + " controls not yet allocated to an operation; " + messagesNoOp.size() + " call messages without an operation");
 
         JsonObject out = new JsonObject();
         out.add("stages", stages);
@@ -171,6 +197,8 @@ public class WorkflowStatusTool extends ReadTool {
         f.add("useCasesWithoutRobustness", noRobust);
         f.add("robustnessWithoutDiagram", robustNoDiagram);
         f.add("useCasesWithoutSequence", noSequence);
+        f.add("controlsNotAllocatedToOperations", controlsNotAllocated);
+        f.add("callMessagesWithoutOperation", messagesNoOp);
         f.add("entitiesNotInDomainModel", entityNotDomain);
         f.add("unstereotypedClassesInRobustness", unstereotyped);
         f.add("robustnessRuleViolations", violations);
@@ -184,6 +212,13 @@ public class WorkflowStatusTool extends ReadTool {
         c.addProperty("iconixProfileApplied", profileApplied);
         out.add("counts", c);
         return out;
+    }
+
+    /** Name compared loosely: "Validate Gate" matches "validateGate()". */
+    static String squash(String n) {
+        if (n == null) return "";
+        int p = n.indexOf('(');
+        return (p >= 0 ? n.substring(0, p) : n).replaceAll("[^A-Za-z0-9]", "").toLowerCase(Locale.ROOT);
     }
 
     /** The one-sentence "what to do next" a bot should follow (the first unfinished stage wins). */

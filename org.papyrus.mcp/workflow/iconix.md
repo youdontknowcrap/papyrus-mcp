@@ -37,8 +37,10 @@ done and what is missing. Each stage below has a matching MCP prompt (in bracket
 - [ ] Preliminary Design Review: narratives, robustness and domain model agree.
 
 ## Stage 5: Sequence diagrams, then the Critical Design Review  [iconix_sequence, iconix_review kind=critical]
-- [ ] One sequence per use case: actor, boundaries, controls, entities become lifelines.
-- [ ] Controls turn into operations on classes. Now add the operations.
+- [ ] One sequence per use case, drawn with `build_sequence` (robustness=..., narrative=true): actor,
+      boundaries and the classes that receive the controls' work become lifelines.
+- [ ] Controls turn into operations on classes (create_operations=true adds them).
+      `workflow_status` lists controls not yet allocated and call messages without an operation.
 - [ ] Critical Design Review: every message is an operation; the class model is ready to code.
 
 ## Agile mapping  [agile_backlog_from_usecases, sprint_plan]
